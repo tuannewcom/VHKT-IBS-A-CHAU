@@ -104,15 +104,6 @@ nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;st
 :root[data-skin] .dlg{border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.28)}
 :root[data-skin] .b{border-radius:999px;padding:2px 9px}
 :root[data-skin] .notice{border-radius:10px}
-/* ---- thanh trên 1 dòng (Mẫu B / mặc định) ---- */
-@media (min-width:1150px){
-:root:not([data-skin="a"]):not([data-skin="c"]) header .top{flex-wrap:nowrap;align-items:center}
-:root:not([data-skin="a"]):not([data-skin="c"]) header .top h1{flex-shrink:0;margin-bottom:8px}
-:root:not([data-skin="a"]):not([data-skin="c"]) header .top h1 .m{display:block;font-size:12.5px!important;margin-top:2px}
-:root:not([data-skin="a"]):not([data-skin="c"]) header .top h1 .dot{display:none}
-:root:not([data-skin="a"]):not([data-skin="c"]) header .top>.bar{flex:1;justify-content:flex-end;min-width:0}
-:root:not([data-skin="a"]):not([data-skin="c"]) header .top>.bar .btn{white-space:nowrap}
-}
 /* ---- sidebar layout for A and C ---- */
 @media (min-width:901px){
 :root[data-skin="a"] header,:root[data-skin="c"] header{position:fixed;top:0;left:0;bottom:0;width:252px;overflow-y:auto;padding:20px 14px 16px;display:flex;flex-direction:column;z-index:10;border-bottom:0}
@@ -168,8 +159,116 @@ nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;st
 :root[data-skin="c"] .st::before{background:#14b8a6}
 :root[data-skin="c"] button.btn.p{background:#0f766e;border-color:#0f766e;color:#fff}
 :root[data-skin="c"] a{color:var(--teal)}
+
+
+/* ===== Tài khoản + thanh trên (chung) ===== */
+.logo{display:none}
+.accb{display:none}
+.accm{display:contents}
+/* ===== Mẫu B – bố cục thanh trên cân đối (máy tính) ===== */
+@media (min-width:901px){
+:root[data-skin="b"]:not([data-dev="m"]) header{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"brand gs act" "nav nav nav";column-gap:28px;align-items:center;padding:14px 24px 0!important;background:linear-gradient(115deg,#0a1d38 0%,#0f3363 48%,#1656a3 100%)!important;box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)}
+:root[data-skin="b"]:not([data-dev="m"]) header .top{display:contents}
+:root[data-skin="b"]:not([data-dev="m"]) header h1{grid-area:brand;margin:0;display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:12px;align-items:center;line-height:1.2}
+:root[data-skin="b"]:not([data-dev="m"]) header h1 .logo{display:flex;grid-row:1/3;width:40px;height:40px;border-radius:11px;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#22d3ee,#2563eb);box-shadow:0 4px 14px rgba(34,211,238,.35)}
+:root[data-skin="b"]:not([data-dev="m"]) header h1 .ttl{font-size:19px;font-weight:700;letter-spacing:-.2px;align-self:end}
+:root[data-skin="b"]:not([data-dev="m"]) header h1 .m{display:block;font-size:12.5px!important;color:#9fc0e6!important;align-self:start;margin-top:2px}
+:root[data-skin="b"]:not([data-dev="m"]) header h1 .dot{display:none}
+:root[data-skin="b"]:not([data-dev="m"]) header>.bar{grid-area:gs;margin:0!important;flex-wrap:nowrap;gap:10px;align-items:center}
+:root[data-skin="b"]:not([data-dev="m"]) header>.bar label{font-size:13px!important;color:#9fc0e6!important;font-weight:500}
+:root[data-skin="b"]:not([data-dev="m"]) header>.bar select{height:38px;width:320px!important;max-width:100%!important;min-width:0;border-radius:10px;padding:0 12px;background-color:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);font-size:14px}
+:root[data-skin="b"]:not([data-dev="m"]) header .top>.bar{grid-area:act;justify-self:end;margin:0!important;flex-wrap:nowrap;gap:12px;align-items:center}
+:root[data-skin="b"]:not([data-dev="m"]) #sb{height:34px;line-height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);text-decoration:none;text-align:center;font-size:13px;color:#e2efff!important;box-sizing:border-box;width:10.5em}
+:root[data-skin="b"]:not([data-dev="m"]) #sb:hover{background:rgba(255,255,255,.16)}
+:root[data-skin="b"]:not([data-dev="m"]) #sb[data-st="ok"]{border-color:rgba(74,222,128,.5);color:#bbf7d0!important}
+:root[data-skin="b"]:not([data-dev="m"]) #sb[data-st="busy"]{border-color:rgba(250,204,21,.5);color:#fef08a!important}
+:root[data-skin="b"]:not([data-dev="m"]) #sb[data-st="err"]{border-color:rgba(248,113,113,.6);color:#fecaca!important;background:rgba(248,113,113,.12)}
+:root[data-skin="b"]:not([data-dev="m"]) .acc{position:relative}
+:root[data-skin="b"]:not([data-dev="m"]) .accb{display:flex;align-items:center;gap:10px;height:42px;padding:0 10px 0 5px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;font:inherit;cursor:pointer}
+:root[data-skin="b"]:not([data-dev="m"]) .accb:hover,:root[data-skin="b"]:not([data-dev="m"]) .acc.open .accb{background:rgba(255,255,255,.16)}
+:root[data-skin="b"]:not([data-dev="m"]) .av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#0a1d38;background:linear-gradient(135deg,#fde68a,#fbbf24)}
+:root[data-skin="b"]:not([data-dev="m"]) .accn{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15;text-align:left}
+:root[data-skin="b"]:not([data-dev="m"]) .accn b{font-size:13.5px;font-weight:600;white-space:nowrap}
+:root[data-skin="b"]:not([data-dev="m"]) .accn small{font-size:11.5px;color:#9fc0e6}
+:root[data-skin="b"]:not([data-dev="m"]) .car{opacity:.8;transition:transform .15s}
+:root[data-skin="b"]:not([data-dev="m"]) .acc.open .car{transform:rotate(180deg)}
+:root[data-skin="b"]:not([data-dev="m"]) .accm{display:none;position:absolute;right:0;top:calc(100% + 8px);z-index:45;width:250px;padding:8px;border-radius:12px;background:var(--card);border:1px solid var(--bd);box-shadow:0 18px 44px rgba(8,20,40,.28);flex-direction:column;gap:2px}
+:root[data-skin="b"]:not([data-dev="m"]) .acc.open .accm{display:flex}
+:root[data-skin="b"]:not([data-dev="m"]) .accm #who{display:block;padding:6px 10px 10px;margin-bottom:4px;border-bottom:1px solid var(--bd);color:var(--mut)!important;font-size:12.5px;white-space:normal}
+:root[data-skin="b"]:not([data-dev="m"]) header .accm .btn{background:transparent!important;border:0!important;color:var(--tx)!important;text-align:left;width:100%;margin:0;padding:8px 10px;border-radius:8px;font-size:14px}
+:root[data-skin="b"]:not([data-dev="m"]) header .accm .btn:hover{background:color-mix(in srgb,var(--pri) 10%,transparent)!important}
+:root[data-skin="b"]:not([data-dev="m"]) header .accm .btn.lo{color:var(--bad)!important;border-top:1px solid var(--bd)!important;border-radius:0 0 8px 8px;margin-top:4px}
+:root[data-skin="b"]:not([data-dev="m"]) header .accm select{width:calc(100% - 4px)!important;margin:2px;background:var(--card)!important;color:var(--tx)!important;border-color:var(--bd)!important;height:36px;border-radius:8px}
+:root[data-skin="b"]:not([data-dev="m"]) nav{grid-area:nav;margin-top:14px!important;display:flex;gap:0!important;flex-wrap:nowrap!important;overflow-x:auto!important;scrollbar-width:none}
+:root[data-skin="b"]:not([data-dev="m"]) nav::-webkit-scrollbar{display:none}
+:root[data-skin="b"]:not([data-dev="m"]) nav button{flex:1 0 auto;justify-content:center;white-space:nowrap;font-size:13px!important;padding:10px 7px!important;color:#c3d7f0!important;font-weight:500}
+:root[data-skin="b"]:not([data-dev="m"]) nav button:hover{color:#fff!important}
+:root[data-skin="b"]:not([data-dev="m"]) nav button.on{box-shadow:inset 0 3px 0 #22d3ee;font-weight:600;color:var(--pri)!important;background:var(--bg)!important}
+}
+@media (min-width:901px) and (max-width:1440px){:root[data-skin="b"]:not([data-dev="m"]) nav svg{display:none!important}}
+@media (min-width:901px) and (max-width:1180px){:root[data-skin="b"]:not([data-dev="m"]) nav button{font-size:12.5px!important;padding:10px 5px!important}}
+@media (min-width:901px) and (max-width:1250px){:root[data-skin="b"]:not([data-dev="m"]) header>.bar select{width:240px!important}:root[data-skin="b"]:not([data-dev="m"]) header{column-gap:18px}}
+@media (min-width:901px) and (max-width:1060px){:root[data-skin="b"]:not([data-dev="m"]) header h1 .m{display:none}:root[data-skin="b"]:not([data-dev="m"]) header h1 .ttl{grid-row:1/3;align-self:center}}
+/* ===== Chế độ điện thoại (html[data-dev="m"]) ===== */
+.mo{display:none!important}
+.seg{display:flex;border:1px solid var(--bd);border-radius:8px;overflow:hidden;margin-top:4px}
+.seg button{flex:1;border:0;background:var(--card);color:var(--tx);padding:9px 6px;font:inherit;font-size:14px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--bd)}
+.seg button.on{background:var(--pri);color:var(--prit);font-weight:600}
+@media (min-width:640px){:root[data-dev="m"] body{max-width:480px;margin:0 auto;box-shadow:0 0 0 1px var(--bd),0 10px 40px rgba(0,0,0,.15);min-height:100vh}}
+:root[data-dev="m"] .mo{display:inline-flex!important}
+:root[data-dev="m"] input,:root[data-dev="m"] select,:root[data-dev="m"] textarea{font-size:16px;padding:9px 10px}
+:root[data-dev="m"] button.btn{min-height:40px;font-size:15px;padding:8px 12px}
+:root[data-dev="m"] header{padding:10px 12px 0!important;position:relative}
+:root[data-dev="m"] header .top{flex-wrap:nowrap!important;align-items:center!important;gap:8px}
+:root[data-dev="m"] header h1{font-size:17px!important;margin:0 0 8px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root[data-dev="m"] header h1 .m{display:none}
+:root[data-dev="m"] #mmenu{margin:0 0 8px;min-height:38px;width:42px;justify-content:center;font-size:20px;line-height:1;padding:0}
+:root[data-dev="m"] header .top>.bar{display:none!important}
+:root[data-dev="m"] body.mopen header .top>.bar{display:flex!important;position:absolute;top:56px;right:8px;left:8px;z-index:40;flex-direction:column;align-items:stretch!important;gap:8px;padding:14px;margin:0!important;border-radius:12px;background:var(--card);border:1px solid var(--bd);box-shadow:0 14px 40px rgba(0,0,0,.3)}
+:root[data-dev="m"] body.mopen header .top>.bar .m,:root[data-dev="m"] body.mopen header .top>.bar a{color:var(--tx)!important;width:auto!important;font-size:14px}
+:root[data-dev="m"] body.mopen header .top>.bar .btn{background:var(--card)!important;color:var(--tx)!important;border-color:var(--bd)!important;margin:0;width:100%}
+:root[data-dev="m"] body.mopen header .top>.bar .btn.p{background:var(--pri)!important;color:var(--prit)!important}
+:root[data-dev="m"] #skin{display:none!important}
+:root[data-dev="m"] header>.bar{flex-wrap:nowrap}
+:root[data-dev="m"] header>.bar select{flex:1;max-width:none!important;width:auto!important;min-width:0}
+:root[data-dev="m"] nav{flex-wrap:nowrap!important;overflow-x:auto!important;gap:2px!important;margin:2px -12px 0;padding:0 8px!important;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+:root[data-dev="m"] nav::-webkit-scrollbar{display:none}
+:root[data-dev="m"] nav button{flex:0 0 auto!important;white-space:nowrap;font-size:14px!important;padding:10px 10px!important}
+:root[data-dev="m"] nav svg{display:none!important}
+:root[data-dev="m"] main{padding:10px 10px 24px}
+:root[data-dev="m"] h2{font-size:15px;margin:16px 0 8px}
+:root[data-dev="m"] .stats{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+:root[data-dev="m"] .st{padding:10px 11px!important}
+:root[data-dev="m"] .st b{font-size:21px}
+:root[data-dev="m"] .st span{font-size:12.5px}
+:root[data-dev="m"] main .bar{gap:6px}
+:root[data-dev="m"] main .bar input{flex:1 1 100%;min-width:0}
+:root[data-dev="m"] main .bar select{flex:1 1 calc(50% - 6px);min-width:0;width:auto}
+:root[data-dev="m"] main .bar .btn{flex:1 1 auto}
+:root[data-dev="m"] .box{overflow:visible;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
+:root[data-dev="m"] table{display:block;min-width:0!important;width:100%}
+:root[data-dev="m"] thead{display:none}
+:root[data-dev="m"] tbody{display:block}
+:root[data-dev="m"] tbody tr{display:block;background:var(--card);border:1px solid var(--bd);border-radius:10px;margin-bottom:10px;padding:8px 12px}
+:root[data-dev="m"] tbody td,:root[data-dev="m"] tbody th{display:block;position:relative;border:0!important;padding:4px 0!important;font-size:14px;background:transparent!important;min-width:0;overflow-wrap:break-word;text-align:left!important}
+:root[data-dev="m"] tbody td[data-l]{padding-left:37%!important;min-height:26px}
+:root[data-dev="m"] tbody td[data-l]::before{content:attr(data-l);position:absolute;left:0;top:5px;width:34%;color:var(--mut);font-size:12.5px;font-weight:500;line-height:1.3}
+:root[data-dev="m"] tbody td>*{max-width:100%}
+:root[data-dev="m"] tbody td:first-child{font-weight:600}
+:root[data-dev="m"] tbody td:empty{display:none}
+:root[data-dev="m"] tbody td.nolab{display:flex;flex-wrap:wrap;gap:6px;padding-top:8px!important}
+:root[data-dev="m"] tbody td.nolab:not(:has(button,a,input,select)){display:block}
+:root[data-dev="m"] tbody td[colspan]{display:block}
+:root[data-dev="m"] tbody tr:hover td{background:transparent!important}
+:root[data-dev="m"] .ov{padding:0;align-items:stretch}
+:root[data-dev="m"] .dlg{border-radius:0!important;max-width:none;min-height:100%;padding:14px 14px 0;box-shadow:none!important}
+:root[data-dev="m"] .dlg .grid{grid-template-columns:1fr}
+:root[data-dev="m"] .dlg .act{position:sticky;bottom:0;background:var(--card);margin:14px -14px 0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--bd);z-index:2}
+:root[data-dev="m"] .dlg .act .btn{flex:1 1 auto}
+:root[data-dev="m"] .dlg .kv{grid-template-columns:1fr!important}
 </style></head><body>
-<header><div class="top"><h1>Quản lý nhà trạm IBS <span class="m" style="font-weight:400;font-size:14px"><span class="dot">· </span>Đơn vị triển khai: Á Châu</span></h1><div class="bar" style="margin:0 0 8px;align-items:center"><span class="m" id="who"></span><a href="#" class="m" id="sb" onclick="openSync();return false"></a><button class="btn nog" onclick="openPw()">Đổi mật khẩu</button><button class="btn" onclick="logout()">Đăng xuất</button><select id="skin" onchange="setSkin(this.value)" style="width:auto" title="Mẫu trang"><option value="b">Mẫu B: Thanh trên</option><option value="a">Mẫu A: Thanh bên</option></select><button class="btn" id="thm" onclick="cycleTheme()">Giao diện: Tự động</button></div></div>
+<header><div class="top"><h1><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13v8M9 21h6"/><circle cx="12" cy="10" r="1.6"/><path d="M8.5 6.5a5 5 0 0 0 0 7M15.5 6.5a5 5 0 0 1 0 7M5.6 3.8a9 9 0 0 0 0 12.4M18.4 3.8a9 9 0 0 1 0 12.4"/></svg></span><span class="ttl">Quản lý nhà trạm IBS</span> <span class="m" style="font-weight:400;font-size:14px"><span class="dot">· </span>Đơn vị triển khai: Á Châu</span></h1><button class="btn mo" id="mmenu" onclick="document.body.classList.toggle('mopen')" aria-label="Menu">☰</button><div class="bar" style="margin:0 0 8px;align-items:center"><a href="#" class="m" id="sb" onclick="openSync();return false"></a><div class="acc" id="acc"><button type="button" class="accb" onclick="accToggle(event)" aria-haspopup="true"><span class="av" id="av"></span><span class="accn"><b id="accn"></b><small id="accr"></small></span><svg class="car" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button><div class="accm"><span class="m" id="who"></span><button class="btn nog" onclick="openPw()">Đổi mật khẩu</button><select id="skin" onchange="setSkin(this.value)" style="width:auto" title="Mẫu trang"><option value="b">Mẫu B: Thanh trên</option><option value="a">Mẫu A: Thanh bên</option></select><button class="btn" id="thm" onclick="cycleTheme()">Giao diện: Tự động</button><button class="btn mo" onclick="setDev('pc')">🖥 Chuyển sang giao diện máy tính</button><button class="btn lo" onclick="logout()">Đăng xuất</button></div></div></div></div>
 <div class="bar" style="margin:0 0 8px;align-items:center"><label for="gs" style="font-size:14px;color:var(--tx);margin:0">Trạm:</label><select id="gs" onchange="setGS(this.value)" style="width:auto;max-width:360px"></select></div>
 <nav><button id="t0" class="on" onclick="tab(0)">Tổng quan</button><button id="t1" onclick="tab(1)">Danh sách trạm</button><button id="t5" onclick="tab(5)">HĐ tòa nhà</button><button id="t2" onclick="tab(2)">HĐ nhà mạng</button><button id="t7" onclick="tab(7)">Hồ sơ</button><button id="t10" onclick="tab(10)">Thiết bị IBS</button><button id="t12" onclick="tab(12)">Bảo dưỡng</button><button id="t9" onclick="tab(9)">Chỉ số điện</button><button id="t3" onclick="tab(3)">Nhật ký vận hành</button><button id="t11" onclick="tab(11)">Kế hoạch công việc</button><button id="t8" onclick="tab(8)">Nhật ký thay đổi</button><button id="t13" onclick="tab(13)">Phân quyền</button></nav></header>
 <main>
@@ -261,6 +360,7 @@ nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;st
 <div id="login" hidden><div class="lg"><h1>Quản lý nhà trạm IBS</h1><div class="m">Đơn vị triển khai: Á Châu</div>
  <label for="lg_u">Tài khoản</label><select id="lg_u"></select>
  <label for="lg_p">Mật khẩu</label><input id="lg_p" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+ <label style="margin-top:10px">Chế độ hiển thị</label><div class="seg" id="lg_dev"><button type="button" data-v="pc" onclick="setDev('pc')">🖥 Máy tính</button><button type="button" data-v="m" onclick="setDev('m')">📱 Điện thoại</button></div>
  <div class="m" id="lg_e" style="color:var(--bad);min-height:20px;margin-top:6px"></div>
  <button class="btn p" style="width:100%" onclick="doLogin()">Đăng nhập</button>
  <div style="margin-top:12px;text-align:center;font-size:13px"><a href="#" onclick="openSync();return false">Kết nối dữ liệu online</a></div></div></div>
@@ -576,7 +676,7 @@ function isAdm(){return ROLE==='admin'}
 function pwh(r){var o=ld('bts_pw')||{};return o[r]||DEFPW[r]}
 function applyRole(){var b=document.body;[].slice.call(b.classList).forEach(function(c){if(/^(no-e-|no-v-|role-)/.test(c))b.classList.remove(c)});b.classList.remove('guest');b.classList.toggle('is-admin',ROLE==='admin');
  if(ROLE){b.classList.add('role-'+(ROLE==='admin'?'admin':ROLE==='vip'?'vip':/^tech/.test(ROLE)?'tech':'guest'));MODS.forEach(function(m){if(!can(m[0]))b.classList.add('no-e-'+m[0]);if(!see(m[0]))b.classList.add('no-v-'+m[0])});if(!see('jobm')&&!can('jobd'))b.classList.add('no-v-jobs');if(!see('bdnt')&&!see('ac'))b.classList.add('no-v-maint');if(/^tech/.test(ROLE)&&myStaff())$('#jld').dataset.me='1'}
- $('#login').hidden=!!ROLE;USER=ROLE?accName(ROLE):'';$('#who').textContent=ROLE?'Tài khoản: '+USER+' ('+roleHint(ROLE)+')':'';
+ $('#login').hidden=!!ROLE;USER=ROLE?accName(ROLE):'';$('#who').textContent=ROLE?'Tài khoản: '+USER+' ('+roleHint(ROLE)+')':'';$('#accn').textContent=USER;$('#accr').textContent=ROLE?roleHint(ROLE):'';$('#av').textContent=avTxt(USER);
  var on=document.querySelector('nav button.on');if(on&&getComputedStyle(on).display==='none')tab(0);
  render();if(!ROLE){loginOpts();setTimeout(function(){$('#lg_p').focus()},0)}}
 function doLogin(){var r=$('#lg_u').value,p=$('#lg_p').value;if(r!=='admin'&&!(ACL[r]&&ACL[r].on)){$('#lg_e').textContent='Tài khoản đang bị khóa.';return}if(H('bts|'+p)!==pwh(r)){$('#lg_e').textContent='Sai mật khẩu.';$('#lg_p').select();return}
@@ -1125,7 +1225,7 @@ function syncNow(tries){if(!syncOn())return Promise.resolve();if(SYNC.busy){clea
   if(m.version>SYNC.ver)return sget('action=load').then(function(sv){applyData(sv.data,wasJoin);setBase(sv.data,sv.version)})})
  .then(function(){SYNC.busy=false;SYNC.last=new Date().toISOString();syncBadge();if(SYNC.dirty&&SYNC.gen!==gen){clearTimeout(SYNC.timer);SYNC.timer=setTimeout(syncNow,800)}},
   function(e){SYNC.busy=false;if(e&&e.conflict&&tries<3)return syncNow(tries+1);SYNC.err=(e&&e.message)||String(e);if(/Failed to fetch|NetworkError|Load failed/i.test(SYNC.err))SYNC.err='Không kết nối được máy chủ (mất mạng?). Thay đổi được giữ lại và sẽ gửi khi có mạng.';syncBadge();clearTimeout(SYNC.timer);SYNC.timer=setTimeout(syncNow,15000)})}
-function syncBadge(){var e=$('#sb');if(!e)return;e.style.color='';var set=function(t,full){e.textContent=t;e.title=(full||t)+' – bấm để xem chi tiết'};if(!syncOn()){set('○ Chưa kết nối','Đồng bộ online: chưa kết nối');return}
+function syncBadge(){var e=$('#sb');if(!e)return;e.style.color='';var set=function(t,full){e.textContent=t;e.title=(full||t)+' – bấm để xem chi tiết';e.dataset.st=t.charAt(0)==='✓'?'ok':t.charAt(0)==='⚠'?'err':t.charAt(0)==='○'?'off':'busy'};if(!syncOn()){set('○ Chưa kết nối','Đồng bộ online: chưa kết nối');return}
  if(SYNC.busy){set('⟳ Đang đồng bộ…');return}if(SYNC.err){set(SYNC.dirty?'⚠ Chưa gửi được':'⚠ Lỗi đồng bộ',SYNC.dirty?'Chưa gửi được thay đổi':'Lỗi đồng bộ: '+SYNC.err);e.style.color='#ffb4a8';if(!document.documentElement.dataset.skin)e.style.color='var(--bad)';return}
  set(SYNC.dirty?'● Chờ gửi…':'✓ Đồng bộ'+(SYNC.last?' '+fdt(SYNC.last).slice(11):''),SYNC.dirty?'Có thay đổi chờ gửi':'Đã đồng bộ'+(SYNC.last?' lúc '+fdt(SYNC.last):''))}
 function syncCode(){return btoa(unescape(encodeURIComponent(JSON.stringify({u:SYNC.cfg.url,t:SYNC.cfg.token}))))}
@@ -1144,6 +1244,18 @@ function openSync(){var on=syncOn(),ad=isAdm(),m=SYNC.srv;
  +'<textarea id="sy_gas" rows="8" readonly style="font-family:monospace;font-size:12px">'+esc($('#gas').textContent.trim())+'</textarea><div class="act" style="margin-top:6px;justify-content:flex-start"><button class="btn" onclick="$(\'#sy_gas\').select();try{document.execCommand(\'copy\');$(\'#err\').textContent=\'Đã sao chép mã Apps Script.\'}catch(e){}">Sao chép mã</button></div></details>'
  +'<div class="m" id="err" style="margin-top:8px"></div><div class="act">'+(on?'<button class="btn d" onclick="two(this,function(){syncDisconnect();close_()})">Ngắt kết nối máy này</button><button class="btn" onclick="syncNowUI()">Đồng bộ ngay</button>':'')+'<button class="btn" onclick="close_()">Đóng</button></div>')}
 function syncBackupNow(b){if(!isAdm()||!syncOn())return;b.disabled=true;syncMsg('Đang tạo bản sao lưu trên máy chủ…');spost({action:'backupNow',kind:'daily',app:'IBS-AChau',time:new Date().toISOString(),data:snapData()}).then(function(r){b.disabled=false;if(!r.ok)throw new Error(r.error||'Máy chủ báo lỗi');if(SYNC.srv&&r.backupAt)SYNC.srv.lastDaily=r.backupAt;syncMsg(r.mailed?'Đã sao lưu lên Google Drive và gửi email tới tuanlm.vnn@gmail.com.':'Đã sao lưu lên Google Drive.')},function(e){b.disabled=false;syncMsg('Không sao lưu được: '+(e&&e.message||e),1)})}
+/* ===== Chế độ điện thoại ===== */
+function devMode(){var v=null;try{v=localStorage.getItem('bts_dev')}catch(e){}return v==='m'?'m':'pc'}
+function setDev(v){v=v==='m'?'m':'pc';try{localStorage.setItem('bts_dev',v)}catch(e){}var e=document.documentElement;document.body.classList.remove('mopen');
+ if(v==='m'){e.dataset.dev='m';e.dataset.skin='b'}else{delete e.dataset.dev;var k=null;try{k=localStorage.getItem('bts_skin_v2')}catch(er){}setSkin(k)}
+ [].forEach.call(document.querySelectorAll('#lg_dev button'),function(b){b.classList.toggle('on',b.dataset.v===v)});if(v==='m')labelTables()}
+function labelTables(){if(document.documentElement.dataset.dev!=='m')return;[].forEach.call(document.querySelectorAll('table'),function(t){var hr=t.tHead&&t.tHead.rows[t.tHead.rows.length-1];if(!hr)return;var hs=[].map.call(hr.cells,function(c){return c.textContent.trim()});
+ [].forEach.call(t.tBodies,function(tb){[].forEach.call(tb.rows,function(r){if(r.dataset.lb==='1'&&r.cells.length===+r.dataset.lc)return;var ci=0;[].forEach.call(r.cells,function(c){var sp=c.colSpan||1;if(sp===1&&hs[ci]){c.setAttribute('data-l',hs[ci]);c.classList.remove('nolab')}else{c.removeAttribute('data-l');if(sp===1)c.classList.add('nolab')}ci+=sp});r.dataset.lb='1';r.dataset.lc=r.cells.length})})})}
+(function(){var q=0;new MutationObserver(function(){if(q||document.documentElement.dataset.dev!=='m')return;q=1;requestAnimationFrame(function(){q=0;labelTables()})}).observe(document.body,{childList:true,subtree:true})})();
+document.addEventListener('click',function(ev){if(!document.body.classList.contains('mopen'))return;var t=ev.target;if(t.closest&&(t.closest('#mmenu')))return;if(t.closest&&t.closest('header .top>.bar')&&!t.closest('button,a'))return;document.body.classList.remove('mopen')},true);
+function avTxt(n){n=String(n||'').trim();if(!n)return '';var w=n.split(/\s+/),l=w[w.length-1];return /^\d+$/.test(l)&&w.length>1?w[0].charAt(0).toUpperCase()+l:n.charAt(0).toUpperCase()}
+function accToggle(ev){ev.stopPropagation();$('#acc').classList.toggle('open')}
+document.addEventListener('click',function(ev){var a=$('#acc');if(a&&a.classList.contains('open')&&!(ev.target.closest&&ev.target.closest('.accm select,#thm')))a.classList.remove('open')});
 function syncMsg(t,bad){var e=$('#err');if(e){e.style.color=bad?'var(--bad)':'var(--ok)';e.textContent=t}}
 function syncConnectUI(cfg){if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(cfg.url)){syncMsg('URL phải là địa chỉ Web App của Google Apps Script (https://script.google.com/...).',1);return}if(!cfg.token){syncMsg('Nhập mã bảo mật.',1);return}
  syncMsg('Đang kết nối…');syncConnect(cfg).then(function(){if(SYNC.err){syncMsg('Không kết nối được: '+SYNC.err,1);return}var v=SYNC.srv?SYNC.srv.version:0,t=v?'Đã kết nối và tải dữ liệu chung (phiên bản '+v+').':'Đã kết nối. Máy chủ chưa có dữ liệu'+(isAdm()?' – bấm "Đưa dữ liệu máy này lên làm dữ liệu chung" để khởi tạo.':' – nhờ Admin khởi tạo dữ liệu.');if($('#sy_code')){openSync();syncMsg(t)}})}
@@ -1162,7 +1274,7 @@ S=ld(K);L=ld(KL);INV=ld(KI)||[];EL=ld(KE)||[];EQ=ld(KQ)||[];JB=ld(KJ)||[];BM=ld(
 (function(){var b=JSON.stringify(S)+JSON.stringify(INV);S.forEach(mig);fillInvAmt();try{if(!localStorage.getItem('bts_mig_cran')){S.forEach(function(x){if((x.kind||'IBS')==='BTS'&&/^\s*c-?ran\b/i.test(x.name||''))x.kind='CRAN'});localStorage.setItem('bts_mig_cran','1')}}catch(e){}if(JSON.stringify(S)+JSON.stringify(INV)!==b)save()})();
 A=ld(KA)||[];
 loadACL();try{GS=Number(sessionStorage.getItem('bts_gs'))||0;var ss=sessionStorage.getItem('bts_sess');if(ss&&(ss==='admin'||(ACL[ss]&&ACL[ss].on)))ROLE=ss}catch(e){}
-navIcons();(function(){var v=null;try{v=localStorage.getItem('bts_skin_v2')}catch(e){}setSkin(v)})();applyRole();loadFiles().then(function(){if(syncOn()){if(SYNC.base&&!SYNC.joinedByLink)reconcileFiles(SYNC.base.files||[]);syncNow()}});syncBadge();
+navIcons();(function(){var v=null;try{v=localStorage.getItem('bts_skin_v2')}catch(e){}setSkin(v)})();setDev(devMode());applyRole();loadFiles().then(function(){if(syncOn()){if(SYNC.base&&!SYNC.joinedByLink)reconcileFiles(SYNC.base.files||[]);syncNow()}});syncBadge();
 </script>
 <script type="text/plain" id="gas">
 /**
