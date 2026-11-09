@@ -161,6 +161,7 @@ nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;st
 :root[data-skin="c"] a{color:var(--teal)}
 
 
+#updbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:70;display:flex;gap:12px;align-items:center;background:#0f3363;color:#fff;padding:10px 12px 10px 16px;border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.3);font-size:14px;max-width:calc(100% - 24px)}
 /* ===== Tài khoản + thanh trên (chung) ===== */
 .logo{display:none}
 .accb{display:none}
@@ -1256,6 +1257,11 @@ document.addEventListener('click',function(ev){if(!document.body.classList.conta
 function avTxt(n){n=String(n||'').trim();if(!n)return '';var w=n.split(/\s+/),l=w[w.length-1];return /^\d+$/.test(l)&&w.length>1?w[0].charAt(0).toUpperCase()+l:n.charAt(0).toUpperCase()}
 function accToggle(ev){ev.stopPropagation();$('#acc').classList.toggle('open')}
 document.addEventListener('click',function(ev){var a=$('#acc');if(a&&a.classList.contains('open')&&!(ev.target.closest&&ev.target.closest('.accm select,#thm')))a.classList.remove('open')});
+/* ===== Tự kiểm tra phiên bản mới trên GitHub Pages ===== */
+var APPV='2026.11.09-4';
+function checkUpdate(){if(!/^https?:/.test(location.protocol))return;fetch(location.pathname+'?nocache='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(t){var m=/var APPV='([^']+)'/.exec(t||'');if(!m||m[1]===APPV||$('#updbar'))return;
+ var d=document.createElement('div');d.id='updbar';d.innerHTML='Đã có phiên bản mới của ứng dụng. <button class="btn p" onclick="location.replace(location.pathname+\'?v='+m[1]+'\'+location.hash)">Cập nhật ngay</button>';document.body.appendChild(d)}).catch(function(){})}
+setTimeout(checkUpdate,4000);setInterval(checkUpdate,15*60*1000);document.addEventListener('visibilitychange',function(){if(!document.hidden)checkUpdate()});
 function syncMsg(t,bad){var e=$('#err');if(e){e.style.color=bad?'var(--bad)':'var(--ok)';e.textContent=t}}
 function syncConnectUI(cfg){if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(cfg.url)){syncMsg('URL phải là địa chỉ Web App của Google Apps Script (https://script.google.com/...).',1);return}if(!cfg.token){syncMsg('Nhập mã bảo mật.',1);return}
  syncMsg('Đang kết nối…');syncConnect(cfg).then(function(){if(SYNC.err){syncMsg('Không kết nối được: '+SYNC.err,1);return}var v=SYNC.srv?SYNC.srv.version:0,t=v?'Đã kết nối và tải dữ liệu chung (phiên bản '+v+').':'Đã kết nối. Máy chủ chưa có dữ liệu'+(isAdm()?' – bấm "Đưa dữ liệu máy này lên làm dữ liệu chung" để khởi tạo.':' – nhờ Admin khởi tạo dữ liệu.');if($('#sy_code')){openSync();syncMsg(t)}})}
