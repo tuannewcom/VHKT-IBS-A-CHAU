@@ -39,7 +39,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 input,select,textarea{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:5px;padding:7px 9px;width:100%}
 .bar input{flex:1;min-width:180px;width:auto}.bar select{width:auto}
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:16px;z-index:20}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:16px;z-index:60}
 .ov.on{display:flex}
 .dlg{background:var(--card);border-radius:8px;max-width:900px;width:100%;padding:16px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
@@ -65,7 +65,8 @@ body:not(.is-admin) .adm:not([class*="m-"]){display:none!important}
 body.role-guest .nog{display:none!important}
 body:not(.is-admin) #t13{display:none!important}
 body.no-e-sites .m-sites,body.no-e-sitedel .m-sitedel,body.no-e-cdt .m-cdt,body.no-e-nm .m-nm,body.no-e-files .m-files,body.no-e-eq .m-eq,body.no-e-bdnt .m-bdnt,body.no-e-ac .m-ac,body.no-e-el .m-el,body.no-e-log .m-log,body.no-e-jobm .m-jobm,body.no-e-jobd .m-jobd,body.no-e-sys .m-sys{display:none!important}
-body.no-v-sites #t1,body.no-v-cdt #t5,body.no-v-nm #t2,body.no-v-files #t7,body.no-v-eq #t10,body.no-v-bdnt #t12,body.no-v-ac #t4,body.no-v-el #t9,body.no-v-log #t3,body.no-v-jobs #t11,body.no-v-audit #t8{display:none!important}
+body.no-v-sites #t1,body.no-v-cdt #t5,body.no-v-nm #t2,body.no-v-files #t7,body.no-v-eq #t10,body.no-v-maint #t12,body.no-v-el #t9,body.no-v-log #t3,body.no-v-jobs #t11,body.no-v-audit #t8{display:none!important}
+body.no-v-bdnt .c-bd,body.no-v-ac .c-ac{display:none!important}
 body.no-v-nm #finh,body.no-v-nm #fin,body.no-v-nm #finn{display:none!important}
 .acl td,.acl th{white-space:nowrap}.acl select{width:auto;padding:4px 6px}.acl input[type=text]{padding:5px 7px;min-width:130px}
 
@@ -140,6 +141,8 @@ nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;st
 :root[data-skin="b"] nav{padding:0;gap:2px;margin-top:4px;flex-wrap:wrap;overflow:visible}
 :root[data-skin="b"] nav button{background:transparent!important;border:0!important;border-radius:8px 8px 0 0;color:#d6e4f5!important;padding:9px 7px!important;font-size:13px;gap:5px!important;box-shadow:none;letter-spacing:-.15px}
 :root[data-skin="b"] nav svg{width:15px;height:15px}
+@media (max-width:1500px){:root[data-skin="b"] nav button{padding:9px 5px!important;font-size:12.5px;gap:4px!important}:root[data-skin="b"] nav svg{width:14px;height:14px}:root[data-skin="b"] header{padding-left:14px;padding-right:14px}}
+@media (max-width:1300px){:root[data-skin="b"] nav svg{display:none!important}}
 :root[data-skin="b"] nav{gap:0!important}
 :root[data-skin="b"] nav button:hover{background:rgba(255,255,255,.09)!important;color:#fff!important}
 :root[data-skin="b"] nav button.on{background:var(--bg)!important;color:var(--pri)!important;font-weight:600}
@@ -154,9 +157,9 @@ nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;st
 :root[data-skin="c"] button.btn.p{background:#0f766e;border-color:#0f766e;color:#fff}
 :root[data-skin="c"] a{color:var(--teal)}
 </style></head><body>
-<header><div class="top"><h1>Quản lý nhà trạm IBS <span class="m" style="font-weight:400;font-size:14px"><span class="dot">· </span>Đơn vị triển khai: Á Châu</span></h1><div class="bar" style="margin:0 0 8px;align-items:center"><span class="m" id="who"></span><a href="#" class="m adm" id="cb" onclick="openCloud();return false"></a><button class="btn nog" onclick="openPw()">Đổi mật khẩu</button><button class="btn" onclick="logout()">Đăng xuất</button><select id="skin" onchange="setSkin(this.value)" style="width:auto" title="Mẫu trang"><option value="b">Mẫu B: Thanh trên xanh (mặc định)</option><option value="a">Mẫu A: Thanh bên navy</option><option value="">Mẫu: Cổ điển</option><option value="c">Mẫu C: Tối giản sáng</option></select><button class="btn" id="thm" onclick="cycleTheme()">Giao diện: Tự động</button></div></div>
+<header><div class="top"><h1>Quản lý nhà trạm IBS <span class="m" style="font-weight:400;font-size:14px"><span class="dot">· </span>Đơn vị triển khai: Á Châu</span></h1><div class="bar" style="margin:0 0 8px;align-items:center"><span class="m" id="who"></span><a href="#" class="m adm m-sys" id="cb" onclick="openCloud();return false"></a><a href="#" class="m" id="sb" onclick="openSync();return false"></a><button class="btn nog" onclick="openPw()">Đổi mật khẩu</button><button class="btn" onclick="logout()">Đăng xuất</button><select id="skin" onchange="setSkin(this.value)" style="width:auto" title="Mẫu trang"><option value="b">Mẫu B: Thanh trên xanh (mặc định)</option><option value="a">Mẫu A: Thanh bên navy</option><option value="">Mẫu: Cổ điển</option><option value="c">Mẫu C: Tối giản sáng</option></select><button class="btn" id="thm" onclick="cycleTheme()">Giao diện: Tự động</button></div></div>
 <div class="bar" style="margin:0 0 8px;align-items:center"><label for="gs" style="font-size:14px;color:var(--tx);margin:0">Trạm:</label><select id="gs" onchange="setGS(this.value)" style="width:auto;max-width:360px"></select></div>
-<nav><button id="t0" class="on" onclick="tab(0)">Tổng quan</button><button id="t1" onclick="tab(1)">Danh sách trạm</button><button id="t5" onclick="tab(5)">HĐ tòa nhà</button><button id="t2" onclick="tab(2)">HĐ nhà mạng</button><button id="t7" onclick="tab(7)">Hồ sơ</button><button id="t10" onclick="tab(10)">Thiết bị IBS</button><button id="t12" onclick="tab(12)">BD nhà trạm</button><button id="t4" onclick="tab(4)">BD máy lạnh</button><button id="t9" onclick="tab(9)">Chỉ số điện</button><button id="t3" onclick="tab(3)">Nhật ký vận hành</button><button id="t11" onclick="tab(11)">Kế hoạch công việc</button><button id="t8" onclick="tab(8)">Nhật ký thay đổi</button><button id="t13" onclick="tab(13)">Phân quyền</button></nav></header>
+<nav><button id="t0" class="on" onclick="tab(0)">Tổng quan</button><button id="t1" onclick="tab(1)">Danh sách trạm</button><button id="t5" onclick="tab(5)">HĐ tòa nhà</button><button id="t2" onclick="tab(2)">HĐ nhà mạng</button><button id="t7" onclick="tab(7)">Hồ sơ</button><button id="t10" onclick="tab(10)">Thiết bị IBS</button><button id="t12" onclick="tab(12)">Bảo dưỡng</button><button id="t9" onclick="tab(9)">Chỉ số điện</button><button id="t3" onclick="tab(3)">Nhật ký vận hành</button><button id="t11" onclick="tab(11)">Kế hoạch công việc</button><button id="t8" onclick="tab(8)">Nhật ký thay đổi</button><button id="t13" onclick="tab(13)">Phân quyền</button></nav></header>
 <main>
 <div class="notice" id="gsn" hidden style="background:var(--warnb);color:var(--warn)"></div>
 <div class="notice" id="sw" hidden>Không lưu được dữ liệu vào trình duyệt (bộ nhớ đầy hoặc đang ở chế độ ẩn danh). Hãy mở Sao lưu / nhập và tải file sao lưu ngay để không mất dữ liệu.</div>
@@ -184,13 +187,6 @@ nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;st
  <div class="bar"><select id="iy" onchange="render()"></select><select id="ist" onchange="render()"><option value="">Tất cả tình trạng</option><option value="un">Chưa nhận tiền</option><option value="pd">Đã nhận tiền</option></select><button class="btn p adm m-nm" onclick="openInv()">Thêm hóa đơn</button><button class="btn" onclick="expInv()">Xuất CSV</button></div>
  <div class="box"><table><thead><tr><th>Trạm</th><th>Nhà mạng</th><th>Kỳ</th><th>Số hóa đơn</th><th>Ngày xuất</th><th>Giá trị hóa đơn</th><th>Đã nhận tiền</th><th>Còn phải thu</th><th></th></tr></thead><tbody id="irow"></tbody></table></div>
 </section>
-<section id="p4" hidden>
- <div class="stats" id="acst"></div>
- <div class="bar"> <select id="as" onchange="render()"><option value="">Tất cả tình trạng</option><option value="due">Quá hạn / đến hạn trong 30 ngày</option><option value="none">Chưa có lịch</option></select></div>
- <div class="box"><table><thead><tr><th>Trạm</th><th>Máy lạnh</th><th>Chu kỳ</th><th>BD gần nhất</th><th>Kỳ kế tiếp</th><th>Các kỳ tiếp theo (12 tháng)</th><th></th></tr></thead><tbody id="arow"></tbody></table></div>
- <h2>Lịch sử bảo dưỡng máy lạnh</h2>
- <div class="box"><table><thead><tr><th>Ngày</th><th>Trạm</th><th>Nội dung</th><th></th></tr></thead><tbody id="ahis"></tbody></table></div>
-</section>
 <section id="p7" hidden>
  <div class="stats" id="hsst"></div>
  <div class="box adm m-files" style="padding:12px;margin-bottom:12px"><b>Tải hồ sơ PDF lên</b><div class="bar" style="margin:8px 0 0"><select id="hu_s"></select><select id="hu_c"></select><input id="hu_n" placeholder="Ghi chú (không bắt buộc)"><input type="file" id="hu_f" accept=".pdf,application/pdf" multiple hidden onchange="upMain()"><button class="btn p adm m-files" onclick="$('#hu_f').click()">Chọn file PDF và tải lên</button></div><div class="m" id="hu_m"></div></div>
@@ -217,13 +213,15 @@ nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;st
 </section>
 <section id="p12" hidden>
  <div class="stats" id="bmst"></div>
- <div class="bar"><select id="bs" onchange="render()"></select><button class="btn p adm m-bdnt" onclick="openBM()">Ghi nhận bảo dưỡng</button><button class="btn" onclick="expBM()">Xuất CSV</button></div>
- <h2>Tồn tại chưa khắc phục</h2>
+ <div class="bar"><select id="bs" onchange="render()"></select><select id="as" onchange="render()"><option value="">Tất cả tình trạng</option><option value="due">Quá hạn / đến hạn trong 30 ngày</option><option value="none">Chưa có lịch</option></select><button class="btn p adm m-bdnt" onclick="openBM()">Ghi nhận BD nhà trạm</button><button class="btn" onclick="expBM()">Xuất CSV</button></div>
+ <h2>Lịch bảo dưỡng</h2>
+ <div class="box"><table><thead><tr><th>Trạm</th><th class="c-bd">Bảo dưỡng nhà trạm</th><th class="c-ac">Bảo dưỡng máy lạnh</th><th></th></tr></thead><tbody id="mrow"></tbody></table></div>
+ <div class="c-bd"><h2>Tồn tại chưa khắc phục</h2>
  <div class="box"><table><thead><tr><th>Trạm</th><th>Phát hiện</th><th>Tồn tại</th><th></th></tr></thead><tbody id="bmiss"></tbody></table></div>
- <h2>Lịch bảo dưỡng nhà trạm (chung cho cả 3 nhà mạng)</h2>
- <div class="box"><table><thead><tr><th>Trạm</th><th>Chu kỳ</th><th>BD gần nhất</th><th>Kỳ kế tiếp</th><th></th></tr></thead><tbody id="bmsch"></tbody></table></div>
  <h2>Lịch sử bảo dưỡng nhà trạm</h2>
- <div class="box"><table class="wide"><thead><tr><th>Trạm</th><th>Ngày</th><th>Nhà mạng</th><th>Người thực hiện</th><th>Nội dung</th><th>Tồn tại</th><th>Ảnh</th><th></th></tr></thead><tbody id="bmrow"></tbody></table></div>
+ <div class="box"><table class="wide"><thead><tr><th>Trạm</th><th>Ngày</th><th>Nhà mạng</th><th>Người thực hiện</th><th>Nội dung</th><th>Tồn tại</th><th>Ảnh</th><th></th></tr></thead><tbody id="bmrow"></tbody></table></div></div>
+ <div class="c-ac"><h2>Lịch sử bảo dưỡng máy lạnh</h2>
+ <div class="box"><table><thead><tr><th>Ngày</th><th>Trạm</th><th>Nội dung</th><th></th></tr></thead><tbody id="ahis"></tbody></table></div></div>
 </section>
 <section id="p9" hidden>
  <div class="stats" id="elst"></div>
@@ -252,7 +250,8 @@ nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;st
  <label for="lg_u">Tài khoản</label><select id="lg_u"></select>
  <label for="lg_p">Mật khẩu</label><input id="lg_p" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
  <div class="m" id="lg_e" style="color:var(--bad);min-height:20px;margin-top:6px"></div>
- <button class="btn p" style="width:100%" onclick="doLogin()">Đăng nhập</button></div></div>
+ <button class="btn p" style="width:100%" onclick="doLogin()">Đăng nhập</button>
+ <div style="margin-top:12px;text-align:center;font-size:13px"><a href="#" onclick="openSync();return false">Kết nối dữ liệu online</a></div></div></div>
 <div class="ov" id="ov"><div class="dlg" id="dlg"></div></div>
 <script>
 var KI='bts_inv_v1',INV=[],K='bts_sites_v1',KL='bts_logs_v1',KT='bts_theme',S=[],L=[];
@@ -318,7 +317,7 @@ function st(s,th){if(!s)return{c:'',t:''};var n=days(s);return{c:n<0?'bad':n<=th
 function inl(s,th){if(!s)return '<span class="m">—</span>';var i=st(s,th);return fmt(s)+' <span class="b '+i.c+'">'+i.t+'</span>'}
 function cell(s,th){if(!s)return '<span class="m">Chưa có</span>';var i=st(s,th);return fmt(s)+'<br><span class="b '+i.c+'">'+i.t+'</span>'}
 function ld(k){try{var r=localStorage.getItem(k);if(r)return JSON.parse(r)}catch(e){}return null}
-function save(){cloudSched();var ok=true;try{localStorage.setItem(K,JSON.stringify(S));localStorage.setItem(KI,JSON.stringify(INV));localStorage.setItem(KE,JSON.stringify(EL));localStorage.setItem(KQ,JSON.stringify(EQ));localStorage.setItem(KJ,JSON.stringify(JB));localStorage.setItem(KB,JSON.stringify(BM));localStorage.setItem(KL,JSON.stringify(L))}catch(e){ok=false}$('#sw').hidden=ok;return ok}
+function save(){cloudSched();markDirty();var ok=true;try{localStorage.setItem(K,JSON.stringify(S));localStorage.setItem(KI,JSON.stringify(INV));localStorage.setItem(KE,JSON.stringify(EL));localStorage.setItem(KQ,JSON.stringify(EQ));localStorage.setItem(KJ,JSON.stringify(JB));localStorage.setItem(KB,JSON.stringify(BM));localStorage.setItem(KL,JSON.stringify(L))}catch(e){ok=false}$('#sw').hidden=ok;return ok}
 function sample(){
  var a={id:1,kind:'IBS',code:'HCM_0123',staff:'Lê Minh Tuấn',staffPhone:'0912000001',name:'Tân Bình 1',lat:'10.8012',lng:'106.6528',addr:'12 Cộng Hòa, P.12, Tân Bình',prov:'TP.HCM',type:'Rooftop',area:1200,blocks:2,floors:25,cdtName:'Ban QL Tòa nhà Cộng Hòa Plaza',cdtContact:'Chị Hương',cdtPhone:'0905000005',cdtMode:DIR,cdtHd:'CDT-2024-05',cdtSign:off(-400),cdtStart:off(-400),cdtEnd:off(330),cdtPrice:6000000,cdtPay:3,cdtPayNext:off(12),owner:'Nguyễn Văn A',phone:'0901000001',uctt:'Trần Văn B',uctPhone:'0902000002',ran:'Huawei BBU3910, 2G/3G/4G',ant:6,tilt:'Az 0/120/240, Tilt 4/4/6',cab:'DC 48V, 1 tủ',batt:'4 bình 100Ah',battH:4,gen:'',acQty:2,acCap:'18000 BTU',alarm:'Khói, cửa',elec:'PE12345678',room:'Block A, tầng hầm B1, phòng kỹ thuật',bdCycle:6,bdLast:off(-170),acCycle:3,acLast:off(-60),note:'Dữ liệu mẫu',
  mb_area:20,mb_hd:'MB-01',mb_start:off(-500),mb_end:off(400),mb_price:12000000,mb_payAmt:36000000,mb_ky:'Quý 3/2026',mb_sign:off(-30),mb_next:off(60),
@@ -400,7 +399,7 @@ function render_(){
   r+='<tr><td><b>'+esc(x.code)+'</b><br><span class="m">'+esc(x.name)+'</span></td><td>'+c[1]+(ca.length>1?'<br><span class="b">HĐ số '+o.i+' / '+ca.length+'</span>':'')+'</td><td>'+esc(o.hd||'—')+'<br><span class="m">'+(o.price?'Giá trị HĐ: '+money(o.price):'')+(one&&x[p+'area']?(o.price?' · ':'')+esc(x[p+'area'])+' m²':'')+(one?(function(){var lv=lastInv(x.id,c[0]),v=lv?lv.amt:x[p+'payAmt'];return v?'<br>Xuất HĐơn kỳ này: '+money(v):''})():'')+'</span></td><td>'+(o.start?'<span class="m">Từ '+fmt(o.start)+'</span><br>':'')+cell(o.eff,90)+plT(o)+oaT(o)+'</td>'
    +(one?'<td>'+esc(x[p+'ky']||'—')+'<br><span class="m">Ký NT: '+fmt(x[p+'sign'])+'</span></td><td>'+pay+'</td><td>'+cell(x[p+'next'],15)+'</td>':'<td colspan="3" class="m">Nghiệm thu, hóa đơn theo dòng HĐ số 1</td>')
    +'<td><button class="btn adm m-sites" onclick="openForm('+x.id+',\'nm\')">Sửa</button>'+(one?hsBtn(x.id,c[0]):'')+'</td></tr>'})})});
- renderAC();renderCDT();renderInv();renderEl();renderEq();renderJobs();renderBM();renderHS();renderAudit();renderACL();
+ renderCDT();renderInv();renderEl();renderEq();renderJobs();renderBM();renderAC();renderHS();renderAudit();renderACL();
  $('#crow').innerHTML=r||'<tr><td colspan="8" class="empty">Chưa có hợp đồng nhà mạng. Mở trạm và nhập mục Hợp đồng nhà mạng.</td></tr>';
  var lf=$('#lf'),cur=lf.value;lf.innerHTML='<option value="">Tất cả trạm</option>'+S.map(function(x){return '<option value="'+x.id+'">'+esc(sopt(x))+'</option>'}).join('');lf.value=cur;
  var lt=$('#lt'),curT=lt.value;lt.innerHTML='<option value="">Tất cả loại</option>'+LT.map(function(t){return '<option>'+esc(t)+'</option>'}).join('');lt.value=curT;
@@ -410,7 +409,7 @@ function render_(){
   if(l.type===LT[5]&&l.val!==''){var v=Number(l.val);t=v>26||v<23?' <span class="b warn">Ngoài 23-26°C</span>':''}
   if(l.type===LT[0]&&l._d)t='<br><span class="'+(l._d.kwh<0?'b bad':'m')+'">'+(l._d.kwh<0?'Chỉ số giảm ':'+')+l._d.kwh.toLocaleString('vi-VN')+' kWh từ '+fmt(l._d.from)+(l._d.n>0&&l._d.kwh>=0?' ('+(l._d.kwh/l._d.n).toLocaleString('vi-VN',{maximumFractionDigits:1})+' kWh/ngày)':'')+'</span>';
   return '<tr><td>'+fmt(l.date)+'</td><td>'+snm(x)+'</td><td>'+esc(l.type)+'</td><td>'+esc(l.val)+t+'</td><td>'+esc(l.note)+'</td><td><button class="btn d adm m-log" onclick="two(this,function(){delLog('+l.id+')})">Xóa</button></td></tr>'}).join('')||'<tr><td colspan="6" class="empty">Chưa có nhật ký. Bấm Thêm nhật ký để ghi điện năng, nhiên liệu, nhiệt độ, sự cố hoặc bảo dưỡng.</td></tr>'}
-function tab(i){[0,1,2,3,4,5,7,8,9,10,11,12,13].forEach(function(j){$('#p'+j).hidden=j!==i;$('#t'+j).className=j===i?'on':''})}
+function tab(i){[0,1,2,3,5,7,8,9,10,11,12,13].forEach(function(j){$('#p'+j).hidden=j!==i;$('#t'+j).className=j===i?'on':''})}
 function two(b,f){if(b.dataset.s)f();else{b.dataset.s=1;b.textContent='Bấm lại để xóa'}}
 function payCell(x,k){var pn=x[k+'PayNext'];return pn?cell(pn,15)+'<br><span class="m">'+(x[k+'Pay']?esc(x[k+'Pay'])+' tháng/kỳ':'Chưa có chu kỳ')+'</span><br><button class="btn adm m-cdt" onclick="payDone('+x.id+',\''+k+'\')">Đã thanh toán kỳ này</button>':'<span class="m">Chưa có</span>'}
 function trm(x){return '<td><b>'+esc(x.code)+'</b><br><span class="m">'+esc(x.name)+'</span></td>'}
@@ -435,19 +434,7 @@ function renderCDT(){var df=$('#df').value,has=function(x){return x.cdtName||ctr
  $('#dtrow').innerHTML=r2||'<tr><td colspan="7" class="empty">Chưa có trạm nào ký qua Đối tác. Mở trạm, trang HĐ tòa nhà, chọn Hình thức ký là Qua Đối tác.</td></tr>'}
 function payDone(id,k){if(!can('cdt'))return;var x=site(id),n=Number(x[k+'Pay']);if(!(n>0)){openForm(id,'cdt');$('#err').textContent='Nhập chu kỳ thanh toán (tháng) để tự tính kỳ kế tiếp.';return}
  var ov=x[k+'PayNext'];x[k+'PayNext']=addM(x[k+'PayNext'],n);audit(id,'Ghi nhận đã thanh toán',[{f:(k==='bc'?'HĐ Đối tác':'HĐ CĐT')+' - Kỳ thanh toán kế tiếp',o:fmt2(ov),n:fmt2(x[k+'PayNext'])}]);save();render()}
-function renderAC(){var as=$('#as').value,lim=off(365),all=S.map(function(x){return {x:x,next:nxt(x,'','ac')}});
- var ov=0,soon=0,none=0;all.forEach(function(r){if(!r.next){none++;return}var i=st(r.next,30);if(i.c==='bad')ov++;else if(i.c==='warn')soon++});
- var mc=0;S.forEach(function(x){mc+=Number(x.acQty)||0});
- $('#acst').innerHTML='<div class="st"><b>'+mc+'</b><span>Tổng số máy lạnh</span></div><div class="st'+(ov?' bad':'')+'"><b>'+ov+'</b><span>Trạm quá hạn bảo dưỡng</span></div><div class="st'+(soon?' warn':'')+'"><b>'+soon+'</b><span>Đến hạn trong 30 ngày</span></div><div class="st"><b>'+none+'</b><span>Chưa có lịch (thiếu ngày BD gần nhất)</span></div>';
- var rows=all.filter(function(r){if(as==='none')return !r.next;if(as==='due')return r.next&&st(r.next,30).c!=='ok';return true})
-  .sort(function(a,b){return (a.next||'9999')<(b.next||'9999')?-1:1});
- $('#arow').innerHTML=rows.map(function(r){var x=r.x,cy=Number(x.acCycle)||0,up=[];
-  if(r.next&&cy>0){for(var k=2;k<=13&&up.length<6;k++){var d=addM(x.acLast,cy*k);if(d>lim)break;up.push(fmt(d))}}
-  return '<tr><td><b>'+esc(x.code)+'</b><br><span class="m">'+esc(x.name)+'</span></td><td>'+(x.acQty?esc(x.acQty)+' máy':'<span class="m">—</span>')+(x.acCap?'<br><span class="m">'+esc(x.acCap)+'</span>':'')+'</td>'
-  +'<td>'+(cy?cy+' tháng':'<span class="m">Chưa có</span>')+'</td><td>'+fmt(x.acLast)+'</td><td>'+cell(r.next,30)+'</td><td class="m">'+(up.join('<br>')||'—')+'</td>'
-  +'<td><button class="btn p adm m-ac" onclick="acDlg('+x.id+')">Ghi nhận BD</button><br><button class="btn adm m-sites" onclick="openForm('+x.id+',\'bd\')">Sửa lịch</button></td></tr>'}).join('')
-  ||'<tr><td colspan="7" class="empty">'+(S.length?'Không có trạm nào khớp bộ lọc.':'Chưa có trạm nào.')+'</td></tr>';
- var his=L.filter(function(l){return inGS(l.sid)&&l.type===LT[7]&&/^Máy lạnh/.test(l.note||'')}).sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:b.id-a.id});
+function renderAC(){var sf=$('#bs').value,his=L.filter(function(l){return inGS(l.sid)&&(!sf||String(l.sid)===sf)&&l.type===LT[7]&&/^Máy lạnh/.test(l.note||'')}).sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:b.id-a.id});
  $('#ahis').innerHTML=his.map(function(l){var x=site(l.sid);return '<tr><td>'+fmt(l.date)+'</td><td>'+snm(x)+'</td><td>'+esc(l.note)+'</td><td><button class="btn d adm m-log" onclick="two(this,function(){delLog('+l.id+')})">Xóa</button></td></tr>'}).join('')
   ||'<tr><td colspan="4" class="empty">Chưa có lần bảo dưỡng máy lạnh nào được ghi nhận.</td></tr>'}
 function acDlg(id){if(!can('ac'))return;var x=site(id);
@@ -559,7 +546,7 @@ function defAcc(id){var p={};MODS.forEach(function(m){p[m[0]]='view'});
  else{p.sitedel='none';p.sys='none';p.jobd='none'}
  return {name:(ACCS.filter(function(a){return a[0]===id})[0]||[0,id])[1],on:true,staff:'',mine:/^tech/.test(id),p:p}}
 function loadACL(){var o=ld('bts_acl_v1')||{};ACL={};ACCS.forEach(function(a){if(a[0]==='admin')return;var d=defAcc(a[0]),x=o[a[0]]||{};ACL[a[0]]={name:x.name||d.name,on:x.on!==false,staff:x.staff||'',mine:x.mine==null?d.mine:!!x.mine,p:Object.assign({},d.p,x.p||{})}})}
-function saveACL(){try{localStorage.setItem('bts_acl_v1',JSON.stringify(ACL))}catch(e){}}
+function saveACL(){markDirty();try{localStorage.setItem('bts_acl_v1',JSON.stringify(ACL))}catch(e){}}
 function accName(id){return id==='admin'?'Admin':(ACL[id]&&ACL[id].name)||id}
 function roleHint(id){return id==='admin'?'toàn quyền':id==='vip'?'VIP':/^tech/.test(id)?'kỹ thuật':id==='guest'?'chỉ xem':''}
 function lvl(m){if(ROLE==='admin')return 'edit';var a=ACL[ROLE];return a&&a.p[m]||'none'}
@@ -576,7 +563,7 @@ function loginOpts(){var sel=$('#lg_u'),cur=sel.value;sel.innerHTML=ACCS.filter(
 function isAdm(){return ROLE==='admin'}
 function pwh(r){var o=ld('bts_pw')||{};return o[r]||DEFPW[r]}
 function applyRole(){setTimeout(cloudDaily,3000);var b=document.body;[].slice.call(b.classList).forEach(function(c){if(/^(no-e-|no-v-|role-)/.test(c))b.classList.remove(c)});b.classList.remove('guest');b.classList.toggle('is-admin',ROLE==='admin');
- if(ROLE){b.classList.add('role-'+(ROLE==='admin'?'admin':ROLE==='vip'?'vip':/^tech/.test(ROLE)?'tech':'guest'));MODS.forEach(function(m){if(!can(m[0]))b.classList.add('no-e-'+m[0]);if(!see(m[0]))b.classList.add('no-v-'+m[0])});if(!see('jobm')&&!can('jobd'))b.classList.add('no-v-jobs');if(/^tech/.test(ROLE)&&myStaff())$('#jld').dataset.me='1'}
+ if(ROLE){b.classList.add('role-'+(ROLE==='admin'?'admin':ROLE==='vip'?'vip':/^tech/.test(ROLE)?'tech':'guest'));MODS.forEach(function(m){if(!can(m[0]))b.classList.add('no-e-'+m[0]);if(!see(m[0]))b.classList.add('no-v-'+m[0])});if(!see('jobm')&&!can('jobd'))b.classList.add('no-v-jobs');if(!see('bdnt')&&!see('ac'))b.classList.add('no-v-maint');if(/^tech/.test(ROLE)&&myStaff())$('#jld').dataset.me='1'}
  $('#login').hidden=!!ROLE;USER=ROLE?accName(ROLE):'';$('#who').textContent=ROLE?'Tài khoản: '+USER+' ('+roleHint(ROLE)+')':'';
  var on=document.querySelector('nav button.on');if(on&&getComputedStyle(on).display==='none')tab(0);
  render();if(!ROLE){loginOpts();setTimeout(function(){$('#lg_p').focus()},0)}}
@@ -606,7 +593,7 @@ function resetACL(){if(!isAdm())return;try{localStorage.removeItem('bts_acl_v1')
 
 /* ===== Nhật ký thay đổi ===== */
 var KA='bts_audit_v1',A=[];
-function saveA(){cloudSched();try{localStorage.setItem(KA,JSON.stringify(A))}catch(e){$('#sw').hidden=false}}
+function saveA(){cloudSched();markDirty();try{localStorage.setItem(KA,JSON.stringify(A))}catch(e){$('#sw').hidden=false}}
 function audit(sid,act,det){var x=site(sid);A.push({id:Date.now()+'-'+Math.floor(Math.random()*1e4),t:new Date().toISOString(),sid:sid||0,code:x?x.code:'',name:x?x.name||'':'',act:act,det:det||'',u:USER||'?'});if(A.length>5000)A=A.slice(A.length-5000);saveA()}
 function fmt2(v){return v?fmt(v):''}
 function flab(f){var m=/^(mb|vt|vn)_/.exec(f[0]);return (m?crn(m[1])+' - ':/^cdt(Hd|Sign|Start|End|Price|Pay|Pl)/.test(f[0])?'HĐ CĐT - ':/^bc/.test(f[0])?'HĐ Đối tác - ':'')+f[1]}
@@ -644,8 +631,8 @@ function addFiles(sid,cat,list,note,ext){ext=ext||{};if(!fileCan(cat,ext))return
  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
  return tx('readwrite',function(s){recs.forEach(function(r){s.put(r)})}).then(function(){FM=FM.concat(recs);recs.forEach(function(r){audit(sid,'Đính kèm hồ sơ',fcn(cat)+': '+r.name+' ('+fsz(r.size)+')')});render();return 'Đã lưu '+recs.length+' file'+(bad?', bỏ qua '+bad+' file không đúng định dạng':'')+'.'})
   .catch(function(e){return 'Không lưu được file: '+(e&&e.name==='QuotaExceededError'?'bộ nhớ trình duyệt đã đầy.':(e&&e.message||e))})}
-function openFile(id){var f=fget(id);if(!f)return;var u=URL.createObjectURL(new Blob([f.blob],{type:f.blob.type||(isImg(f)?'image/jpeg':'application/pdf')}));window.open(u,'_blank');setTimeout(function(){URL.revokeObjectURL(u)},120000)}
-function dlFile(id){var f=fget(id);if(!f)return;var a=document.createElement('a');a.href=URL.createObjectURL(f.blob);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},0)}
+function openFile(id){var f=fget(id);if(!f)return;if(!f.blob){var w=window.open('','_blank');ensureBlob(f).then(function(){var u2=URL.createObjectURL(new Blob([f.blob],{type:f.blob.type||(isImg(f)?'image/jpeg':'application/pdf')}));if(w)w.location.href=u2;else window.open(u2,'_blank')},function(e){if(w)w.close();alert('Không tải được file: '+(e.message||e))});return}var u=URL.createObjectURL(new Blob([f.blob],{type:f.blob.type||(isImg(f)?'image/jpeg':'application/pdf')}));window.open(u,'_blank');setTimeout(function(){URL.revokeObjectURL(u)},120000)}
+function dlFile(id){var f=fget(id);if(!f)return;if(!f.blob){ensureBlob(f).then(function(){dlFile(id)},function(e){alert('Không tải được file: '+(e.message||e))});return}var a=document.createElement('a');a.href=URL.createObjectURL(f.blob);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},0)}
 function delFile(id,silent){var f=fget(id);if(!f)return;if(!silent&&!fileCanF(f))return;tx('readwrite',function(s){s.delete(id)}).then(function(){FM=FM.filter(function(z){return z.id!==id});if(!silent)audit(f.sid,'Xóa hồ sơ',fcn(f.cat)+': '+f.name);refreshAtt();if(VIEWREF)VIEWREF();render()})}
 function fileLine(f){return '<div class="fl"><a href="#" onclick="openFile('+f.id+');return false">'+esc(f.name)+'</a><span class="m">'+fsz(f.size)+' · '+fmt(f.date)+(f.note?' · '+esc(f.note):'')+'</span><span style="margin-left:auto;display:flex;gap:6px"><button type="button" class="btn" onclick="dlFile('+f.id+')">Tải về</button><button type="button" class="btn d adm m-files" onclick="two(this,function(){delFile('+f.id+')})">Xóa</button></span></div>'}
 function attInner(sid,cat){if(!sid)return '<b>Hồ sơ đính kèm</b> <span class="m">· Lưu trạm trước, sau đó mở lại để đính kèm file PDF.</span>';
@@ -666,7 +653,7 @@ function renderHS(){var so=S.map(function(x){return [String(x.id),x.code+' '+(x.
  $('#hrow').innerHTML=fs.map(function(f){var x=site(f.sid);return '<tr><td><a href="#" onclick="openFile('+f.id+');return false">'+esc(f.name)+'</a></td><td>'+snm(x)+'</td><td>'+fcn(f.cat)+'</td><td>'+fmt(f.date)+'</td><td>'+fsz(f.size)+'</td><td>'+esc(f.note)+'</td><td style="white-space:nowrap"><button class="btn" onclick="dlFile('+f.id+')">Tải về</button> <button class="btn d adm m-files" onclick="two(this,function(){delFile('+f.id+')})">Xóa</button></td></tr>'}).join('')
   ||'<tr><td colspan="7" class="empty">'+(FM.length?'Không có hồ sơ nào khớp bộ lọc.':'Chưa có hồ sơ nào. Tải PDF lên ở khung phía trên, hoặc mở trạm và bấm Đính kèm PDF trong từng mục hợp đồng.')+'</td></tr>'}
 function b64(blob){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(String(r.result).split(',')[1]||'')};r.onerror=rej;r.readAsDataURL(blob)})}
-function packFiles(){return Promise.all(FM.map(function(f){return b64(f.blob).then(function(d){var o={};for(var k in f)if(k!=='blob')o[k]=f[k];o.data=d;return o})}))}
+function packFiles(){return Promise.all(FM.map(function(f){return (f.blob?Promise.resolve(f):ensureBlob(f)).then(function(){return b64(f.blob)}).then(function(d){var o={};for(var k in f)if(k!=='blob'&&k!=='rem'&&k!=='_p')o[k]=f[k];o.data=d;return o})}))}
 function bkFull(){$('#err').style.color='';$('#err').textContent='Đang đóng gói '+FM.length+' hồ sơ...';
  packFiles().then(function(files){
   dl('sao-luu-ibs-kem-ho-so-'+iso(today())+'.json',JSON.stringify({sites:S,logs:L,audit:A,inv:INV,elec:EL,eq:EQ,jobs:JB,bm:BM,acl:ACL,files:files}),'application/json');$('#err').textContent='Đã tải file sao lưu gồm '+files.length+' hồ sơ PDF.'})
@@ -733,8 +720,8 @@ function syncInv(o){CR.forEach(function(c,i){var p=c[0]+'_',d=o[p+'invDate'],a=S
 /* ===== Ảnh dùng chung cho công việc / bảo dưỡng ===== */
 var VIEWREF=null;
 function isImg(f){return /^image\//.test(f.type)||/\.(jpe?g|png|webp|gif|heic)$/i.test(f.name)}
-function gallery(fs,del){return fs.length?'<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">'+fs.map(function(f){var img=isImg(f);var u=img?URL.createObjectURL(f.blob):'';
- return '<div style="width:132px;border:1px solid var(--bd);border-radius:6px;padding:4px;font-size:12px"><a href="#" onclick="openFile('+f.id+');return false">'+(img?'<img src="'+u+'" alt="" style="width:100%;height:90px;object-fit:cover;border-radius:4px;display:block">':'<div style="height:90px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:4px">PDF</div>')+'</a><div style="word-break:break-all;margin-top:3px">'+esc(f.name)+'</div><div class="m">'+fmt(f.date)+'</div>'+(del?'<button type="button" class="btn d" style="padding:2px 8px;font-size:12px" onclick="two(this,function(){delFile('+f.id+')})">Xóa</button>':'')+'</div>'}).join('')+'</div>':'<div class="m" style="margin-top:4px">Chưa có ảnh.</div>'}
+function gallery(fs,del){return fs.length?'<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">'+fs.map(function(f){var img=isImg(f)&&!!f.blob;var u=img?URL.createObjectURL(f.blob):'';
+ return '<div style="width:132px;border:1px solid var(--bd);border-radius:6px;padding:4px;font-size:12px"><a href="#" onclick="openFile('+f.id+');return false">'+(img?'<img src="'+u+'" alt="" style="width:100%;height:90px;object-fit:cover;border-radius:4px;display:block">':'<div style="height:90px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:4px">'+(f.blob?'PDF':'Đang tải…')+'</div>')+'</a><div style="word-break:break-all;margin-top:3px">'+esc(f.name)+'</div><div class="m">'+fmt(f.date)+'</div>'+(del?'<button type="button" class="btn d" style="padding:2px 8px;font-size:12px" onclick="two(this,function(){delFile('+f.id+')})">Xóa</button>':'')+'</div>'}).join('')+'</div>':'<div class="m" style="margin-top:4px">Chưa có ảnh.</div>'}
 function upPics(sid,cat,ext,el,msgId){addFiles(sid,cat,el.files,'',ext).then(function(m){el.value='';if(VIEWREF)VIEWREF();var e=$('#'+msgId);if(e)e.textContent=m})}
 
 /* ===== Kế hoạch công việc ===== */
@@ -838,13 +825,16 @@ var KB='bts_bm_v1',BM=[];
 function sampleBM(){return [{id:1,sid:1,cr:'all',date:off(-170),who:'Lê Minh Tuấn',note:'Vệ sinh phòng máy, kiểm tra tiếp địa, siết lại đầu nối.',issues:[{t:'Rò rỉ nước trần phòng máy B1',done:false},{t:'Thiếu nhãn cáp tầng 12',done:true,doneAt:off(-150)}]},{id:2,sid:2,cr:'vt',date:off(-60),who:'Phạm Văn Hùng',note:'Bảo dưỡng định kỳ, đo điện trở tiếp địa 3,2 Ω.',issues:[{t:'Cửa tủ nguồn bị kẹt khóa',done:false}]}]}
 function bmCr(c){return c==='all'?'Chung cả 3 nhà mạng':crn(c)}
 function bmFiles(id){return FM.filter(function(f){return f.bid===id})}
-function renderBM(){var sf=$('#bs').value;opts($('#bs'),'Tất cả trạm',S.map(function(x){return [String(x.id),sopt(x)]}));sf=$('#bs').value;var inS=function(sid){return inGS(sid)&&(!sf||String(sid)===sf)};
- var sch=[];S.forEach(function(x){if(!inS(x.id))return;sch.push({x:x,next:nxt(x,'','bd'),cy:x.bdCycle,last:x.bdLast})});
+function mCell(x,k){var nx=nxt(x,'',k),cy=Number(x[k+'Cycle'])||0;return '<span class="m">'+(cy?'Chu kỳ '+cy+' tháng':'Chưa có chu kỳ')+(x[k+'Last']?' · gần nhất '+fmt(x[k+'Last']):'')+'</span><br>'+(nx?'Kế tiếp '+inl(nx,30):'<span class="m">Chưa có lịch</span>')}
+function renderBM(){var sf=$('#bs').value;opts($('#bs'),'Tất cả trạm',S.map(function(x){return [String(x.id),sopt(x)]}));sf=$('#bs').value;var inS=function(sid){return inGS(sid)&&(!sf||String(sid)===sf)},asv=$('#as').value;
+ var sch=[];S.forEach(function(x){if(!inS(x.id))return;sch.push({x:x,next:nxt(x,'','bd'),na:nxt(x,'','ac'),cy:x.bdCycle,last:x.bdLast})});
+ var aov=sch.filter(function(r){return r.na&&days(r.na)<0}).length,asoon=sch.filter(function(r){return r.na&&days(r.na)>=0&&days(r.na)<=30}).length,mc=0;sch.forEach(function(r){mc+=Number(r.x.acQty)||0});
+ var due=function(d){return d&&st(d,30).c!=='ok'},rows=sch.filter(function(r){return asv==='due'?(due(r.next)||due(r.na)):asv==='none'?(!r.next||!r.na):true}).sort(function(a,b){var ma=[a.next,a.na].filter(Boolean).sort()[0]||'9999',mb=[b.next,b.na].filter(Boolean).sort()[0]||'9999';return ma<mb?-1:1});
+ $('#mrow').innerHTML=rows.map(function(r){var x=r.x;return '<tr><td>'+snm(x)+'</td><td class="c-bd">'+mCell(x,'bd')+'<br><button class="btn p adm m-bdnt" onclick="openBM(0,'+x.id+',\'all\')">Ghi nhận BD nhà trạm</button></td><td class="c-ac"><b>'+(x.acQty?esc(x.acQty)+' máy':'<span class="m">Chưa nhập số máy</span>')+'</b>'+(x.acCap?' <span class="m">· '+esc(x.acCap)+'</span>':'')+'<br>'+mCell(x,'ac')+'<br><button class="btn adm m-ac" onclick="acDlg('+x.id+')">Ghi nhận BD máy lạnh</button></td><td><button class="btn adm m-sites" onclick="openForm('+x.id+',\'bd\')">Sửa lịch</button></td></tr>'}).join('')||'<tr><td colspan="4" class="empty">'+(sch.length?'Không có trạm nào khớp bộ lọc.':'Chưa có trạm nào.')+'</td></tr>';
  sch.sort(function(a,b){return (a.next||'9999')<(b.next||'9999')?-1:1});
  var recs=BM.filter(function(b){return inS(b.sid)&&site(b.sid)}),openI=[];recs.forEach(function(b){(b.issues||[]).forEach(function(it,i){if(!it.done)openI.push({b:b,it:it,i:i})})});
  var ov=sch.filter(function(r){return r.next&&days(r.next)<0}).length,soon=sch.filter(function(r){return r.next&&days(r.next)>=0&&days(r.next)<=30}).length;
- $('#bmst').innerHTML='<div class="st'+(ov?' bad':'')+'"><b>'+ov+'</b><span>Kỳ BD nhà trạm quá hạn</span></div><div class="st'+(soon?' warn':'')+'"><b>'+soon+'</b><span>Đến hạn trong 30 ngày</span></div><div class="st'+(openI.length?' warn':'')+'"><b>'+openI.length+'</b><span>Tồn tại chưa khắc phục</span></div><div class="st"><b>'+recs.length+'</b><span>Lần bảo dưỡng đã ghi</span></div>';
- $('#bmsch').innerHTML=sch.map(function(r){return '<tr><td>'+snm(r.x)+'</td><td>'+(r.cy?esc(r.cy)+' tháng':'<span class="m">Chưa có</span>')+'</td><td>'+fmt(r.last)+'</td><td>'+cell(r.next,30)+'</td><td><button class="btn p adm m-bdnt" onclick="openBM(0,'+r.x.id+',\'all\')">Ghi nhận BD</button></td></tr>'}).join('')||'<tr><td colspan="5" class="empty">Chưa có trạm nào.</td></tr>';
+ $('#bmst').innerHTML='<div class="st c-bd'+(ov?' bad':'')+'"><b>'+ov+'</b><span>BD nhà trạm quá hạn</span></div><div class="st c-bd'+(soon?' warn':'')+'"><b>'+soon+'</b><span>BD nhà trạm đến hạn (30 ngày)</span></div><div class="st c-ac'+(aov?' bad':'')+'"><b>'+aov+'</b><span>BD máy lạnh quá hạn</span></div><div class="st c-ac'+(asoon?' warn':'')+'"><b>'+asoon+'</b><span>BD máy lạnh đến hạn (30 ngày)</span></div><div class="st c-bd'+(openI.length?' warn':'')+'"><b>'+openI.length+'</b><span>Tồn tại chưa khắc phục</span></div><div class="st c-ac"><b>'+mc+'</b><span>Tổng số máy lạnh</span></div>';
  $('#bmiss').innerHTML=openI.sort(function(a,b){return a.b.date<b.b.date?-1:1}).map(function(o){return '<tr><td>'+snm(site(o.b.sid))+'</td><td>'+fmt(o.b.date)+'<br><span class="m">'+esc(bmCr(o.b.cr))+'</span></td><td><b>'+esc(o.it.t)+'</b><br><span class="m">Tồn tại '+(-days(o.b.date))+' ngày</span></td><td style="white-space:nowrap"><button class="btn adm m-bdnt" onclick="bmFix('+o.b.id+','+o.i+')">Đã khắc phục</button> <button class="btn" onclick="openBMView('+o.b.id+')">Xem ảnh</button></td></tr>'}).join('')||'<tr><td colspan="4" class="empty">Không có tồn tại nào chưa khắc phục.</td></tr>';
  $('#bmrow').innerHTML=recs.sort(function(a,b){return a.date<b.date?1:-1}).map(function(b){var is=b.issues||[],op=is.filter(function(i){return !i.done}).length;return '<tr><td>'+snm(site(b.sid))+'</td><td>'+fmt(b.date)+'</td><td>'+esc(bmCr(b.cr))+'</td><td>'+esc(b.who||'—')+'</td><td>'+esc(b.note||'')+'</td><td>'+(is.length?'<span class="b '+(op?'warn':'ok')+'">'+op+' / '+is.length+' chưa khắc phục</span>':'<span class="m">Không có</span>')+'</td><td>'+bmFiles(b.id).length+'</td><td style="white-space:nowrap"><button class="btn p" onclick="openBMView('+b.id+')">Xem</button></td></tr>'}).join('')||'<tr><td colspan="8" class="empty">Chưa có lần bảo dưỡng nhà trạm nào được ghi.</td></tr>'}
 function openBM(id,sid,cr){if(!can('bdnt'))return;if(!S.length){show('<p>Thêm trạm trước.</p><div class="act"><button class="btn" onclick="close_()">Đóng</button></div>');return}
@@ -1116,79 +1106,239 @@ var NAVI={t0:'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',t1
 function navIcons(){Object.keys(NAVI).forEach(function(k){var b=$('#'+k);if(b&&!b.querySelector('svg'))b.insertAdjacentHTML('afterbegin','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+NAVI[k]+'"/></svg>')})}
 function setSkin(v){var e=document.documentElement;if(v)e.dataset.skin=v;else delete e.dataset.skin;try{localStorage.setItem('bts_skin_v2',v||'')}catch(er){}var s=$('#skin');if(s)s.value=v||''}
 
+/* ===== Đồng bộ online (Google Apps Script + Google Drive) ===== */
+var SYNC={cfg:ld('bts_sync'),ver:Number((function(){try{return localStorage.getItem('bts_sync_ver')}catch(e){return 0}})()||0),dirty:(function(){try{return localStorage.getItem('bts_sync_dirty')==='1'}catch(e){return false}})(),gen:0,base:ld('bts_sync_base'),busy:false,err:'',last:'',up:{},timer:null,apply:false,srv:null};
+(function(){var a=ld('bts_sync_up')||[];a.forEach(function(i){SYNC.up[String(i)]=1})})();
+function syncOn(){return !!(SYNC.cfg&&SYNC.cfg.url&&SYNC.cfg.token)}
+function syncLS(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v))}catch(e){}}
+function saveUp(){syncLS('bts_sync_up',Object.keys(SYNC.up))}
+function metaOf(f){return JSON.parse(JSON.stringify({id:f.id,sid:f.sid,cat:f.cat,name:f.name,size:f.size,date:f.date,note:f.note||'',tid:f.tid,bid:f.bid,type:f.type||(f.blob&&f.blob.type)||''}))}
+function emptyData(){return {sites:[],logs:[],audit:[],inv:[],elec:[],eq:[],jobs:[],bm:[],acl:null,pw:{},files:[]}}
+function snapData(){return JSON.parse(JSON.stringify({sites:S,logs:L,audit:A,inv:INV,elec:EL,eq:EQ,jobs:JB,bm:BM,acl:ACL,pw:ld('bts_pw')||{},files:FM.map(metaOf)}))}
+function markDirty(){if(!syncOn()||SYNC.apply)return;SYNC.dirty=true;SYNC.gen++;syncLS('bts_sync_dirty','1');clearTimeout(SYNC.timer);SYNC.timer=setTimeout(syncNow,1500);syncBadge()}
+function surl(q){var u=SYNC.cfg.url;return u+(u.indexOf('?')<0?'?':'&')+q+'&token='+encodeURIComponent(SYNC.cfg.token)+'&_='+Date.now()}
+function sparse(t){var j;try{j=JSON.parse(t)}catch(e){throw new Error('Máy chủ đồng bộ trả về không đúng định dạng. Kiểm tra URL (kết thúc bằng /exec) và quyền truy cập "Bất kỳ ai".')}if(!j.ok&&!j.conflict)throw new Error(j.error||'Máy chủ báo lỗi');return j}
+function sget(q){return fetch(surl(q),{redirect:'follow'}).then(function(r){return r.text()}).then(sparse)}
+function spost(o){o.token=SYNC.cfg.token;return fetch(SYNC.cfg.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o),redirect:'follow'}).then(function(r){return r.text()}).then(sparse)}
+function mergeArr(b,l,s){var key=function(x){return String(x.id)},bm={},lm={},out=(s||[]).slice(),idx={};(b||[]).forEach(function(x){bm[key(x)]=x});(l||[]).forEach(function(x){lm[key(x)]=x});out.forEach(function(x,i){idx[key(x)]=i});
+ (l||[]).forEach(function(x){var k=key(x),bx=bm[k];if(!bx||JSON.stringify(bx)!==JSON.stringify(x)){if(idx[k]!=null)out[idx[k]]=x;else{idx[k]=out.length;out.push(x)}}});
+ var del={};(b||[]).forEach(function(x){if(!lm[key(x)])del[key(x)]=1});return out.filter(function(x){return !del[key(x)]})}
+function mergeObj(b,l,s){var o=Object.assign({},s||{});b=b||{};Object.keys(l||{}).forEach(function(k){if(JSON.stringify(l[k])!==JSON.stringify(b[k]))o[k]=l[k]});return o}
+function mergeData(b,l,s){b=b||emptyData();s=s||emptyData();var m={};['sites','logs','inv','elec','eq','jobs','bm','files'].forEach(function(k){m[k]=mergeArr(b[k],l[k],s[k])});
+ var seen={};m.audit=[];(s.audit||[]).concat(l.audit||[]).forEach(function(e){if(!seen[e.id]){seen[e.id]=1;m.audit.push(e)}});m.audit.sort(function(x,y){return x.t<y.t?-1:x.t>y.t?1:0});if(m.audit.length>5000)m.audit=m.audit.slice(m.audit.length-5000);
+ m.acl=s.acl?mergeObj(b.acl,l.acl,s.acl):l.acl;m.pw=mergeObj(b.pw,l.pw,s.pw);return m}
+function setBase(d,v){SYNC.base=JSON.parse(JSON.stringify(d||emptyData()));SYNC.ver=v;syncLS('bts_sync_ver',String(v));syncLS('bts_sync_base',SYNC.base)}
+function applyData(d,join){d=d||emptyData();SYNC.apply=true;try{
+ S=d.sites||[];L=d.logs||[];A=d.audit||[];INV=d.inv||[];EL=d.elec||[];EQ=d.eq||[];JB=d.jobs||[];BM=d.bm||[];S.forEach(mig);
+ if(d.acl){syncLS('bts_acl_v1',d.acl);loadACL()}if(d.pw)syncLS('bts_pw',d.pw);save();saveA();
+ if(join)FM.forEach(function(f){SYNC.up[String(f.id)]=1});reconcileFiles(d.files||[])}finally{SYNC.apply=false}
+ if(ROLE&&ROLE!=='admin'&&!(ACL[ROLE]&&ACL[ROLE].on)){ROLE='';try{sessionStorage.removeItem('bts_sess')}catch(e){}close_()}
+ if(!$('#ov').classList.contains('on')||!ROLE)applyRole();else{render();refreshAtt();if(VIEWREF)VIEWREF()}}
+function reconcileFiles(meta){var ids={};meta.forEach(function(m){ids[String(m.id)]=1});
+ FM.filter(function(f){return !ids[String(f.id)]&&SYNC.up[String(f.id)]}).forEach(function(f){tx('readwrite',function(s){s.delete(f.id)}).catch(function(){})});
+ FM=FM.filter(function(f){return ids[String(f.id)]||!SYNC.up[String(f.id)]});
+ meta.forEach(function(m){var f=fget(m.id);if(f){['sid','cat','name','size','date','note','tid','bid'].forEach(function(k){if(m[k]!==undefined)f[k]=m[k]})}else FM.push(Object.assign({},m,{blob:null,rem:1}))});
+ setTimeout(dlRemote,200)}
+function ensureBlob(f){if(f.blob)return Promise.resolve(f);if(!syncOn())return Promise.reject(new Error('Chưa kết nối đồng bộ online'));if(f._p)return f._p;
+ f._p=sget('action=file&id='+encodeURIComponent(f.id)).then(function(j){var bin=atob(j.b64||''),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);f.blob=new Blob([u],{type:j.type||f.type||''});delete f.rem;var rec={};Object.keys(f).forEach(function(k){if(k!=='rem'&&k!=='_p')rec[k]=f[k]});return tx('readwrite',function(s){s.put(rec)})})
+  .then(function(){SYNC.up[String(f.id)]=1;saveUp();delete f._p;return f},function(e){delete f._p;throw e});return f._p}
+var DLBUSY=false;function dlRemote(){if(DLBUSY||!syncOn())return;var q=FM.filter(function(f){return f.rem&&!f.blob});if(!q.length)return;DLBUSY=true;var n=0;
+ (function next(){var f=q.shift();if(!f){DLBUSY=false;if(n){refreshAtt();if(VIEWREF)VIEWREF();render()}return}ensureBlob(f).then(function(){n++},function(){}).then(next)})()}
+function uploadPending(){var q=FM.filter(function(f){return f.blob&&!SYNC.up[String(f.id)]});
+ return q.reduce(function(p,f){return p.then(function(){return b64(f.blob).then(function(d){return spost({action:'putFile',id:f.id,name:f.name,type:f.blob.type||f.type||'',b64:d})}).then(function(){SYNC.up[String(f.id)]=1;saveUp()})})},Promise.resolve())}
+function syncNow(tries){if(!syncOn())return Promise.resolve();if(SYNC.busy){clearTimeout(SYNC.timer);SYNC.timer=setTimeout(syncNow,1500);return Promise.resolve()}SYNC.busy=true;SYNC.err='';syncBadge();tries=tries||0;var gen=SYNC.gen,wasJoin=SYNC.ver===0&&!SYNC.dirty;
+ var push=function(base,data){return spost({action:'save',base:base,data:data,user:USER||'(chưa đăng nhập)'}).then(function(r){if(r.conflict){var e=new Error('conflict');e.conflict=1;throw e}setBase(data,r.version);if(SYNC.gen===gen){SYNC.dirty=false;syncLS('bts_sync_dirty',null)}})};
+ return uploadPending().then(function(){return sget('action=meta')}).then(function(m){SYNC.srv=m;
+  if(SYNC.dirty){if(m.version===SYNC.ver)return push(SYNC.ver,snapData());
+   return sget('action=load').then(function(sv){var md=mergeData(SYNC.base,snapData(),sv.data);applyData(md);return push(sv.version,md)})}
+  if(m.version>SYNC.ver)return sget('action=load').then(function(sv){applyData(sv.data,wasJoin);setBase(sv.data,sv.version)})})
+ .then(function(){SYNC.busy=false;SYNC.last=new Date().toISOString();syncBadge();if(SYNC.dirty&&SYNC.gen!==gen){clearTimeout(SYNC.timer);SYNC.timer=setTimeout(syncNow,800)}},
+  function(e){SYNC.busy=false;if(e&&e.conflict&&tries<3)return syncNow(tries+1);SYNC.err=(e&&e.message)||String(e);if(/Failed to fetch|NetworkError|Load failed/i.test(SYNC.err))SYNC.err='Không kết nối được máy chủ (mất mạng?). Thay đổi được giữ lại và sẽ gửi khi có mạng.';syncBadge();clearTimeout(SYNC.timer);SYNC.timer=setTimeout(syncNow,15000)})}
+function syncBadge(){var e=$('#sb');if(!e)return;e.style.color='';if(!syncOn()){e.textContent='Đồng bộ online: chưa kết nối';return}
+ if(SYNC.busy){e.textContent='Đang đồng bộ…';return}if(SYNC.err){e.textContent=SYNC.dirty?'Chưa gửi được thay đổi – bấm để xem':'Lỗi đồng bộ – bấm để xem';e.style.color='#ffb4a8';if(!document.documentElement.dataset.skin)e.style.color='var(--bad)';return}
+ e.textContent=SYNC.dirty?'Có thay đổi chờ gửi…':'Đã đồng bộ'+(SYNC.last?' '+fdt(SYNC.last).slice(11):'')}
+function syncCode(){return btoa(unescape(encodeURIComponent(JSON.stringify({u:SYNC.cfg.url,t:SYNC.cfg.token}))))}
+function syncLink(){return location.href.split('#')[0]+'#ket-noi='+syncCode()}
+function parseSyncCode(c){c=(c||'').trim();var m=/ket-noi=([^&\s]+)/.exec(c);if(m)c=decodeURIComponent(m[1]);try{var o=JSON.parse(decodeURIComponent(escape(atob(c))));if(o&&o.u&&o.t)return {url:o.u,token:o.t}}catch(e){}return null}
+function syncConnect(cfg){SYNC.cfg={url:cfg.url,token:cfg.token};syncLS('bts_sync',SYNC.cfg);setBase(snapData(),0);SYNC.dirty=false;syncLS('bts_sync_dirty',null);SYNC.up={};saveUp();return syncNow()}
+function syncDisconnect(){SYNC.cfg=null;['bts_sync','bts_sync_ver','bts_sync_base','bts_sync_dirty'].forEach(function(k){syncLS(k,null)});SYNC.ver=0;SYNC.base=null;SYNC.dirty=false;SYNC.err='';syncBadge()}
+function openSync(){var on=syncOn(),ad=isAdm(),m=SYNC.srv;
+ show('<h2 style="margin-top:0">Đồng bộ dữ liệu online</h2><p class="m">Mọi thiết bị kết nối cùng một máy chủ sẽ dùng chung dữ liệu: trạm, hợp đồng, hóa đơn, bảo dưỡng, công việc, hồ sơ PDF/ảnh, phân quyền và mật khẩu. Máy chủ là Google Apps Script chạy dưới tài khoản <b>tuanlm.vnn@gmail.com</b>, dữ liệu lưu trên Google Drive của tài khoản đó.</p>'
+ +(on?'<div class="kv" style="margin:8px 0 12px"><div><label>Trạng thái</label><div>'+esc($('#sb').textContent)+'</div></div><div><label>Phiên bản dữ liệu</label><div>Máy này: '+SYNC.ver+(m?' · Máy chủ: '+m.version:'')+'</div></div>'+(m&&m.updatedAt?'<div><label>Cập nhật gần nhất trên máy chủ</label><div>'+fdt(m.updatedAt)+(m.updatedBy?' · '+esc(m.updatedBy):'')+'</div></div>':'')+'</div>'+(SYNC.err?'<div class="notice">'+esc(SYNC.err)+'</div>':''):'')
+ +'<div class="sec">Kết nối bằng link / mã kết nối</div><p class="m" style="margin:6px 0">Dán link kết nối (hoặc mã kết nối) mà Admin gửi cho bạn.</p><div style="display:flex;gap:8px"><input id="sy_code" placeholder="https://...#ket-noi=... hoặc mã kết nối"><button class="btn p" onclick="syncByCode()">Kết nối</button></div>'
+ +'<details style="margin-top:12px"'+(on?'':' open')+'><summary style="cursor:pointer;color:var(--pri)">Nhập thủ công URL máy chủ và mã bảo mật</summary><div class="grid" style="margin-top:8px">'+inp('sy_url','URL Web App (kết thúc bằng /exec)','text',on?SYNC.cfg.url:'')+inp('sy_tok','Mã bảo mật (TOKEN trong Apps Script)','password',on?SYNC.cfg.token:'')+'</div><div class="act" style="justify-content:flex-start"><button class="btn" onclick="syncByForm()">Lưu và kết nối</button></div></details>'
+ +(on&&ad?'<div class="sec" style="margin-top:14px">Dành cho Admin</div><div class="act" style="justify-content:flex-start;flex-wrap:wrap"><button class="btn" onclick="copySyncLink()">Sao chép link kết nối cho thiết bị khác</button><button class="btn d" onclick="two(this,syncPushAll)">Đưa dữ liệu máy này lên làm dữ liệu chung</button></div><p class="m">Gửi link kết nối riêng cho từng người qua Zalo / email (không đăng công khai). Nút "Đưa dữ liệu máy này lên" dùng khi khởi tạo lần đầu hoặc khi cần ghi đè toàn bộ dữ liệu trên máy chủ bằng dữ liệu của máy này.</p>':'')
+ +'<details style="margin-top:12px"><summary style="cursor:pointer;color:var(--pri)">Hướng dẫn cài máy chủ đồng bộ (Admin làm 1 lần)</summary><ol class="m" style="padding-left:18px"><li>Đăng nhập Google bằng <b>tuanlm.vnn@gmail.com</b>, mở <b>script.google.com</b>. Có thể dùng lại dự án "Sao lưu" cũ hoặc tạo dự án mới.</li><li>Xóa mã cũ, dán toàn bộ mã bên dưới, đổi <b>TOKEN</b> thành chuỗi bí mật dài. Bấm Lưu.</li><li><b>Triển khai → Tùy chọn triển khai mới</b> (hoặc Quản lý triển khai → Sửa → Phiên bản mới) → <b>Ứng dụng web</b>, Thực thi với tư cách: <b>Tôi</b>, Ai có quyền truy cập: <b>Bất kỳ ai</b> → Triển khai, cấp quyền.</li><li>Dán URL /exec và TOKEN vào mục "Nhập thủ công" ở trên → Lưu và kết nối.</li><li>Lần đầu: bấm <b>Đưa dữ liệu máy này lên làm dữ liệu chung</b>. Sau đó <b>Sao chép link kết nối</b> gửi cho các thiết bị khác.</li></ol>'
+ +'<textarea id="sy_gas" rows="8" readonly style="font-family:monospace;font-size:12px">'+esc($('#gas').textContent.trim())+'</textarea><div class="act" style="margin-top:6px;justify-content:flex-start"><button class="btn" onclick="$(\'#sy_gas\').select();try{document.execCommand(\'copy\');$(\'#err\').textContent=\'Đã sao chép mã Apps Script.\'}catch(e){}">Sao chép mã</button></div></details>'
+ +'<div class="m" id="err" style="margin-top:8px"></div><div class="act">'+(on?'<button class="btn d" onclick="two(this,function(){syncDisconnect();close_()})">Ngắt kết nối máy này</button><button class="btn" onclick="syncNowUI()">Đồng bộ ngay</button>':'')+'<button class="btn" onclick="close_()">Đóng</button></div>')}
+function syncMsg(t,bad){var e=$('#err');if(e){e.style.color=bad?'var(--bad)':'var(--ok)';e.textContent=t}}
+function syncConnectUI(cfg){if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(cfg.url)){syncMsg('URL phải là địa chỉ Web App của Google Apps Script (https://script.google.com/...).',1);return}if(!cfg.token){syncMsg('Nhập mã bảo mật.',1);return}
+ syncMsg('Đang kết nối…');syncConnect(cfg).then(function(){if(SYNC.err){syncMsg('Không kết nối được: '+SYNC.err,1);return}var v=SYNC.srv?SYNC.srv.version:0,t=v?'Đã kết nối và tải dữ liệu chung (phiên bản '+v+').':'Đã kết nối. Máy chủ chưa có dữ liệu'+(isAdm()?' – bấm "Đưa dữ liệu máy này lên làm dữ liệu chung" để khởi tạo.':' – nhờ Admin khởi tạo dữ liệu.');if($('#sy_code')){openSync();syncMsg(t)}})}
+function syncByCode(){var c=parseSyncCode($('#sy_code').value);if(!c){syncMsg('Link hoặc mã kết nối không hợp lệ.',1);return}syncConnectUI(c)}
+function syncByForm(){syncConnectUI({url:$('#sy_url').value.trim(),token:$('#sy_tok').value.trim()})}
+function syncNowUI(){syncMsg('Đang đồng bộ…');syncNow().then(function(){if(SYNC.err)syncMsg(SYNC.err,1);else syncMsg('Đã đồng bộ. Phiên bản '+SYNC.ver+'.')})}
+function copySyncLink(){var l=syncLink();var done=function(){syncMsg('Đã sao chép link kết nối. Gửi riêng cho người cần dùng.')};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(l).then(done,function(){prompt('Sao chép link kết nối:',l)});else prompt('Sao chép link kết nối:',l)}
+function syncPushAll(){if(!isAdm()||!syncOn())return;syncMsg('Đang tải dữ liệu lên máy chủ…');SYNC.up={};saveUp();
+ uploadPending().then(function(){return sget('action=meta')}).then(function(m){var d=snapData();return spost({action:'save',base:m.version,data:d,user:USER}).then(function(r){if(r.conflict)throw new Error('Có người vừa cập nhật dữ liệu, bấm lại để thử.');setBase(d,r.version);SYNC.dirty=false;syncLS('bts_sync_dirty',null);SYNC.srv={version:r.version,updatedAt:new Date().toISOString(),updatedBy:USER};audit(0,'Khởi tạo dữ liệu đồng bộ online','Đưa toàn bộ dữ liệu máy này lên máy chủ (phiên bản '+r.version+')');syncBadge();syncMsg('Đã đưa dữ liệu lên máy chủ (phiên bản '+r.version+'). Giờ có thể gửi link kết nối cho các thiết bị khác.')})})
+ .catch(function(e){syncMsg('Không tải lên được: '+(e.message||e),1)})}
+(function(){var h=location.hash||'';if(h.indexOf('ket-noi=')>=0){var c=parseSyncCode(h);if(c){SYNC.cfg=c;syncLS('bts_sync',c);setBase(null,0);SYNC.dirty=false;syncLS('bts_sync_dirty',null);SYNC.up={};saveUp();SYNC.joinedByLink=1}try{history.replaceState(null,'',location.href.split('#')[0])}catch(e){}}})();
+setInterval(function(){if(syncOn()&&!document.hidden)syncNow()},20000);
+window.addEventListener('focus',function(){if(syncOn())syncNow()});window.addEventListener('online',function(){if(syncOn())syncNow()});
+
 S=ld(K);L=ld(KL);INV=ld(KI)||[];EL=ld(KE)||[];EQ=ld(KQ)||[];JB=ld(KJ)||[];BM=ld(KB)||[];if(!S){S=sample();L=sampleLog();INV=sampleInv();EL=sampleEl();EQ=sampleEq();JB=sampleJobs();BM=sampleBM();S[0].meterTotal='CT-TONG-0001';S[0].mb_meter='CT-MB-0001';S[0].vt_meter='CT-VT-0001';S[0].vn_meter='CT-VN-0001';S[1].meterTotal='CT-TONG-0010';S[1].vt_meter='CT-VT-0010'}if(!L)L=[];
 (function(){var b=JSON.stringify(S)+JSON.stringify(INV);S.forEach(mig);fillInvAmt();try{if(!localStorage.getItem('bts_mig_cran')){S.forEach(function(x){if((x.kind||'IBS')==='BTS'&&/^\s*c-?ran\b/i.test(x.name||''))x.kind='CRAN'});localStorage.setItem('bts_mig_cran','1')}}catch(e){}if(JSON.stringify(S)+JSON.stringify(INV)!==b)save()})();
 A=ld(KA)||[];
 loadACL();try{GS=Number(sessionStorage.getItem('bts_gs'))||0;var ss=sessionStorage.getItem('bts_sess');if(ss&&(ss==='admin'||(ACL[ss]&&ACL[ss].on)))ROLE=ss}catch(e){}
-navIcons();(function(){var v=null;try{v=localStorage.getItem('bts_skin_v2')}catch(e){}if(v===null)v='b';setSkin(/^[abc]$/.test(v)?v:'')})();applyRole();loadFiles();cloudBadge();
+navIcons();(function(){var v=null;try{v=localStorage.getItem('bts_skin_v2')}catch(e){}if(v===null)v='b';setSkin(/^[abc]$/.test(v)?v:'')})();applyRole();loadFiles().then(function(){if(syncOn()){if(SYNC.base&&!SYNC.joinedByLink)reconcileFiles(SYNC.base.files||[]);syncNow()}});cloudBadge();syncBadge();
 </script>
 <script type="text/plain" id="gas">
 /**
- * Sao lưu tự động cho "Quản lý nhà trạm IBS - Á Châu"
+ * MÁY CHỦ ĐỒNG BỘ ONLINE cho "Quản lý nhà trạm IBS - Á Châu"
  * Chạy dưới tài khoản Google: tuanlm.vnn@gmail.com
  *
- * - Mỗi lần ứng dụng gửi dữ liệu: lưu 1 file .json vào thư mục Google Drive bên dưới.
- * - Bản sao lưu hằng ngày: lưu vào Drive và gửi email kèm file tới EMAIL.
- * - Tự xóa (cho vào thùng rác) các bản cũ, chỉ giữ số bản mới nhất theo cấu hình.
+ * - Lưu dữ liệu chung của mọi thiết bị vào thư mục Google Drive bên dưới (file du-lieu-ibs.json).
+ * - Mỗi lần lưu tăng số phiên bản, giữ lịch sử các phiên bản gần nhất (thư mục "Lich su").
+ * - Hồ sơ PDF / ảnh lưu trong thư mục "Ho so".
+ * - Mỗi ngày tạo một bản sao lưu đầy đủ (thư mục "Hang ngay") và gửi email kèm file.
+ * - Vẫn nhận kiểu sao lưu cũ (Sao lưu tự động) để tương thích.
  */
-const TOKEN = 'DOI-MA-BAO-MAT-NAY';          // Đổi thành chuỗi bí mật riêng, nhập giống hệt vào ứng dụng
-const EMAIL = 'tuanlm.vnn@gmail.com';         // Email nhận bản sao lưu hằng ngày
-const FOLDER = 'Sao luu Quan ly nha tram IBS';
-const KEEP_CHANGE = 100;                      // Số bản sao lưu theo thay đổi được giữ lại
-const KEEP_DAILY = 30;                        // Số bản sao lưu hằng ngày được giữ lại
-const SEND_EMAIL_DAILY = true;                // Gửi email kèm file cho bản sao lưu hằng ngày
+const TOKEN = 'DOI-MA-BAO-MAT-NAY';        // Đổi thành chuỗi bí mật dài, khó đoán. Ai có mã này + URL là đọc/ghi được dữ liệu.
+const EMAIL = 'tuanlm.vnn@gmail.com';       // Email nhận bản sao lưu hằng ngày
+const FOLDER = 'Du lieu Quan ly nha tram IBS';
+const KEEP_HISTORY = 60;                    // Số phiên bản lịch sử giữ lại
+const KEEP_DAILY = 30;                      // Số bản sao lưu hằng ngày giữ lại
+const SEND_EMAIL_DAILY = true;
+const DATA_FILE = 'du-lieu-ibs.json';
+
+function doGet(e) {
+  const p = (e && e.parameter) || {};
+  if (p.token !== TOKEN) return out({ ok: false, error: 'Sai mã bảo mật' });
+  const pr = PropertiesService.getScriptProperties();
+  const meta = { ok: true, version: Number(pr.getProperty('version') || 0), updatedAt: pr.getProperty('updatedAt') || '', updatedBy: pr.getProperty('updatedBy') || '' };
+  if (p.action === 'meta') return out(meta);
+  if (p.action === 'load') {
+    const f = findFile_(root_(), DATA_FILE);
+    meta.data = f ? JSON.parse(f.getBlob().getDataAsString('UTF-8')) : null;
+    return out(meta);
+  }
+  if (p.action === 'file') {
+    const f = findFile_(filesFolder_(), String(p.id));
+    if (!f) return out({ ok: false, error: 'Không tìm thấy file trên máy chủ' });
+    const b = f.getBlob();
+    return out({ ok: true, type: b.getContentType(), b64: Utilities.base64Encode(b.getBytes()) });
+  }
+  return out({ ok: true, app: 'Đồng bộ Quản lý nhà trạm IBS', version: meta.version });
+}
 
 function doPost(e) {
+  let req;
+  try { req = JSON.parse(e.postData.contents); } catch (err) { return out({ ok: false, error: 'Dữ liệu gửi lên không hợp lệ' }); }
+  if (req.token !== TOKEN) return out({ ok: false, error: 'Sai mã bảo mật' });
+  if (req.action === 'save') return save_(req);
+  if (req.action === 'putFile') {
+    const fo = filesFolder_();
+    const old = fo.getFilesByName(String(req.id));
+    while (old.hasNext()) old.next().setTrashed(true);
+    const f = fo.createFile(Utilities.newBlob(Utilities.base64Decode(req.b64), req.type || 'application/octet-stream', String(req.id)));
+    f.setDescription(req.name || '');
+    return out({ ok: true });
+  }
+  return legacyBackup_(req);
+}
+
+function save_(req) {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(25000)) return out({ ok: false, error: 'Máy chủ đang bận, thử lại sau' });
   try {
-    const req = JSON.parse(e.postData.contents);
-    if (req.token !== TOKEN) return out({ ok: false, error: 'Sai mã bảo mật' });
-    const daily = req.kind === 'daily';
-    const folder = getFolder_();
-    const ts = Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd_HH-mm-ss');
-    const name = (daily ? 'hang-ngay_' : 'thay-doi_') + ts + '.json';
-    const blob = Utilities.newBlob(JSON.stringify(req.data), 'application/json', name);
-    folder.createFile(blob);
-    cleanup_(folder, daily ? 'hang-ngay_' : 'thay-doi_', daily ? KEEP_DAILY : KEEP_CHANGE);
-    let mailed = false;
-    if (daily && SEND_EMAIL_DAILY && blob.getBytes().length < 24 * 1024 * 1024) {
-      const d = req.data || {};
-      MailApp.sendEmail({
-        to: EMAIL,
-        subject: 'Sao lưu Quản lý nhà trạm IBS - ' + ts,
-        body: 'Bản sao lưu hằng ngày.\nSố trạm: ' + ((d.sites || []).length) +
-              '\nSố nhật ký vận hành: ' + ((d.logs || []).length) +
-              '\nSố hồ sơ PDF kèm theo: ' + ((d.files || []).length) +
-              '\n\nKhôi phục: mở ứng dụng > Sao lưu / nhập > Mở file sao lưu > Nhập dữ liệu.',
-        attachments: [blob]
-      });
-      mailed = true;
+    const pr = PropertiesService.getScriptProperties();
+    const cur = Number(pr.getProperty('version') || 0);
+    if (Number(req.base) !== cur) return out({ ok: false, conflict: true, version: cur });
+    const root = root_();
+    const txt = JSON.stringify(req.data || {});
+    const f = findFile_(root, DATA_FILE);
+    if (f) f.setContent(txt); else root.createFile(DATA_FILE, txt, 'application/json');
+    const v = cur + 1, now = new Date();
+    pr.setProperties({ version: String(v), updatedAt: now.toISOString(), updatedBy: String(req.user || '') });
+    const ts = Utilities.formatDate(now, 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd_HH-mm-ss');
+    const hist = sub_(root, 'Lich su');
+    hist.createFile('v' + v + '_' + ts + '.json', txt, 'application/json');
+    cleanup_(hist, 'v', KEEP_HISTORY);
+    const last = Number(pr.getProperty('lastDaily') || 0);
+    if (now.getTime() - last > 20 * 3600 * 1000) {
+      daily_(root, txt, ts, req.data || {});
+      pr.setProperty('lastDaily', String(now.getTime()));
+      cleanFiles_(req.data || {});
     }
-    return out({ ok: true, file: name, mailed: mailed });
-  } catch (err) {
-    return out({ ok: false, error: String(err) });
+    return out({ ok: true, version: v });
+  } finally {
+    lock.releaseLock();
   }
 }
 
-function doGet() {
-  return out({ ok: true, app: 'Sao lưu Quản lý nhà trạm IBS' });
+function daily_(root, txt, ts, d) {
+  const fo = sub_(root, 'Hang ngay');
+  fo.createFile('hang-ngay_' + ts + '.json', txt, 'application/json');
+  cleanup_(fo, 'hang-ngay_', KEEP_DAILY);
+  if (SEND_EMAIL_DAILY && txt.length < 20 * 1024 * 1024) {
+    MailApp.sendEmail({
+      to: EMAIL,
+      subject: 'Sao lưu Quản lý nhà trạm IBS - ' + ts,
+      body: 'Bản sao lưu hằng ngày (dữ liệu chung đồng bộ online).\nSố trạm: ' + ((d.sites || []).length) +
+            '\nSố hồ sơ PDF/ảnh: ' + ((d.files || []).length) + ' (file gốc lưu trong thư mục Drive "' + FOLDER + '/Ho so")' +
+            '\n\nKhôi phục: mở ứng dụng > Sao lưu / nhập > Mở file sao lưu > Nhập dữ liệu.',
+      attachments: [Utilities.newBlob(txt, 'application/json', 'sao-luu-ibs_' + ts + '.json')]
+    });
+  }
 }
 
-function getFolder_() {
+// Xóa (cho vào thùng rác) file hồ sơ không còn được dữ liệu tham chiếu, tạo trước đó hơn 1 ngày
+function cleanFiles_(d) {
+  const ids = {};
+  (d.files || []).forEach(function (f) { ids[String(f.id)] = 1; });
+  const it = filesFolder_().getFiles(), lim = Date.now() - 24 * 3600 * 1000;
+  while (it.hasNext()) {
+    const f = it.next();
+    if (!ids[f.getName()] && f.getDateCreated().getTime() < lim) f.setTrashed(true);
+  }
+}
+
+// Kiểu sao lưu cũ (tính năng "Sao lưu tự động")
+function legacyBackup_(req) {
+  const daily = req.kind === 'daily';
+  const fo = sub_(root_(), 'Sao luu tu dong');
+  const ts = Utilities.formatDate(new Date(), 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd_HH-mm-ss');
+  const name = (daily ? 'hang-ngay_' : 'thay-doi_') + ts + '.json';
+  const blob = Utilities.newBlob(JSON.stringify(req.data), 'application/json', name);
+  fo.createFile(blob);
+  cleanup_(fo, daily ? 'hang-ngay_' : 'thay-doi_', daily ? KEEP_DAILY : 100);
+  let mailed = false;
+  if (daily && SEND_EMAIL_DAILY && blob.getBytes().length < 24 * 1024 * 1024) {
+    MailApp.sendEmail({ to: EMAIL, subject: 'Sao lưu Quản lý nhà trạm IBS - ' + ts, body: 'Bản sao lưu hằng ngày.', attachments: [blob] });
+    mailed = true;
+  }
+  return out({ ok: true, file: name, mailed: mailed });
+}
+
+function root_() {
   const it = DriveApp.getFoldersByName(FOLDER);
   return it.hasNext() ? it.next() : DriveApp.createFolder(FOLDER);
 }
-
+function sub_(parent, name) {
+  const it = parent.getFoldersByName(name);
+  return it.hasNext() ? it.next() : parent.createFolder(name);
+}
+function filesFolder_() { return sub_(root_(), 'Ho so'); }
+function findFile_(folder, name) {
+  const it = folder.getFilesByName(name);
+  while (it.hasNext()) { const f = it.next(); if (!f.isTrashed()) return f; }
+  return null;
+}
 function cleanup_(folder, prefix, keep) {
-  const files = [];
-  const it = folder.getFiles();
-  while (it.hasNext()) {
-    const f = it.next();
-    if (f.getName().indexOf(prefix) === 0) files.push(f);
-  }
+  const files = [], it = folder.getFiles();
+  while (it.hasNext()) { const f = it.next(); if (f.getName().indexOf(prefix) === 0) files.push(f); }
   files.sort(function (a, b) { return b.getDateCreated() - a.getDateCreated(); });
   files.slice(keep).forEach(function (f) { f.setTrashed(true); });
 }
-
 function out(o) {
   return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
 }
