@@ -1481,7 +1481,7 @@ function openSync(){var on=syncOn(),ad=isAdm(),m=SYNC.srv;
  +'<div class="sec">Kết nối bằng link / mã kết nối</div><p class="m" style="margin:6px 0">Dán link kết nối (hoặc mã kết nối) mà Admin gửi cho bạn.</p><div style="display:flex;gap:8px"><input id="sy_code" placeholder="https://...#ket-noi=... hoặc mã kết nối"><button class="btn p" onclick="syncByCode()">Kết nối</button></div>'
  +'<details style="margin-top:12px"'+(on?'':' open')+'><summary style="cursor:pointer;color:var(--pri)">Nhập thủ công URL máy chủ và mã bảo mật</summary><div class="grid" style="margin-top:8px">'+inp('sy_url','URL Web App (kết thúc bằng /exec)','text',on?SYNC.cfg.url:'')+inp('sy_tok','Mã bảo mật (TOKEN trong Apps Script)','password',on?SYNC.cfg.token:'')+'</div><div class="act" style="justify-content:flex-start"><button class="btn" onclick="syncByForm()">Lưu và kết nối</button></div></details>'
  +(on&&ad?'<div class="sec" style="margin-top:14px">Dành cho Admin</div><div class="act" style="justify-content:flex-start;flex-wrap:wrap"><button class="btn" onclick="copySyncLink()">Sao chép link kết nối cho thiết bị khác</button><button class="btn p" onclick="rsOpen()">🕘 Khôi phục dữ liệu cũ</button><button class="btn d" onclick="syncPushAll()">Đưa dữ liệu máy này lên làm dữ liệu chung</button></div><p class="m">Gửi link kết nối riêng cho từng người qua Zalo / email (không đăng công khai). Nút "Đưa dữ liệu máy này lên" dùng khi khởi tạo lần đầu hoặc khi cần ghi đè toàn bộ dữ liệu trên máy chủ bằng dữ liệu của máy này.</p>':'')
- +(on?'<div class="sec" style="margin-top:14px">Sao lưu tự động</div><p class="m" style="margin:6px 0">Máy chủ tự sao lưu, không cần cài thêm: mỗi lần dữ liệu thay đổi lưu một phiên bản (Drive: <i>Du lieu Quan ly nha tram IBS/Lich su</i>, giữ 60 bản gần nhất); mỗi ngày một bản đầy đủ (thư mục <i>Hang ngay</i>, giữ 30 bản) và gửi email kèm file tới <b>tuanlm.vnn@gmail.com</b>. Hồ sơ PDF/ảnh lưu sẵn trong thư mục <i>Ho so</i>.'+(m&&m.lastDaily?'<br>Bản sao lưu hằng ngày gần nhất: <b>'+fdt(m.lastDaily)+'</b>':'')+'</p>'+(ad?'<div class="act" style="justify-content:flex-start"><button class="btn" onclick="syncBackupNow(this)">Sao lưu ngay và gửi email</button></div>':''):'<p class="m" style="margin-top:14px"><b>Sao lưu tự động</b> lên Google Drive và email hằng ngày sẽ chạy khi máy đã kết nối đồng bộ online.</p>')
+ +(on?'<div class="sec" style="margin-top:14px">Sao lưu tự động</div><p class="m" style="margin:6px 0">Máy chủ tự sao lưu, không cần cài thêm: mỗi lần dữ liệu thay đổi lưu một phiên bản (Drive: <i>Du lieu Quan ly nha tram IBS/Lich su</i>, giữ 60 bản gần nhất); mỗi ngày <b>lúc '+(m&&m.dailyHour>=0?m.dailyHour:18)+':00</b> tự tạo một bản đầy đủ (thư mục <i>Hang ngay</i>, giữ 30 bản) và gửi email kèm <b>file dữ liệu</b> + <b>file zip các hồ sơ đính kèm mới</b> (file vượt 25 MB gửi dạng link Drive) tới <b>tuanlm.vnn@gmail.com</b>. Hồ sơ PDF/ảnh lưu sẵn trong thư mục <i>Ho so</i>.'+(m&&m.lastDaily?'<br>Bản sao lưu hằng ngày gần nhất: <b>'+fdt(m.lastDaily)+'</b>':'')+'</p>'+(ad?'<div class="act" style="justify-content:flex-start"><button class="btn" onclick="syncBackupNow(this)">Sao lưu ngay và gửi email</button></div>':''):'<p class="m" style="margin-top:14px"><b>Sao lưu tự động</b> lên Google Drive và email hằng ngày sẽ chạy khi máy đã kết nối đồng bộ online.</p>')
  +(on?aiSyncHtml(m,ad):'')
  +'<details style="margin-top:12px"><summary style="cursor:pointer;color:var(--pri)">Hướng dẫn cài máy chủ đồng bộ (Admin làm 1 lần)</summary><ol class="m" style="padding-left:18px"><li>Đăng nhập Google bằng <b>tuanlm.vnn@gmail.com</b>, mở <b>script.google.com</b>. Có thể dùng lại dự án "Sao lưu" cũ hoặc tạo dự án mới.</li><li>Xóa mã cũ, dán toàn bộ mã bên dưới, đổi <b>TOKEN</b> thành chuỗi bí mật dài. Bấm Lưu.</li><li><b>Triển khai → Tùy chọn triển khai mới</b> (hoặc Quản lý triển khai → Sửa → Phiên bản mới) → <b>Ứng dụng web</b>, Thực thi với tư cách: <b>Tôi</b>, Ai có quyền truy cập: <b>Bất kỳ ai</b> → Triển khai, cấp quyền.</li><li>Dán URL /exec và TOKEN vào mục "Nhập thủ công" ở trên → Lưu và kết nối.</li><li>Lần đầu: bấm <b>Đưa dữ liệu máy này lên làm dữ liệu chung</b>. Sau đó <b>Sao chép link kết nối</b> gửi cho các thiết bị khác.</li></ol>'
  +'<textarea id="sy_gas" rows="8" readonly style="font-family:monospace;font-size:12px">'+esc($('#gas').textContent.trim())+'</textarea><div class="act" style="margin-top:6px;justify-content:flex-start"><button class="btn" onclick="$(\'#sy_gas\').select();try{document.execCommand(\'copy\');$(\'#err\').textContent=\'Đã sao chép mã Apps Script.\'}catch(e){}">Sao chép mã</button></div></details>'
@@ -1501,7 +1501,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){var a=$('#a
 function accToggle(ev){ev.stopPropagation();$('#acc').classList.toggle('open')}
 document.addEventListener('click',function(ev){var a=$('#acc');if(a&&a.classList.contains('open')&&!(ev.target.closest&&ev.target.closest('.accm select,#thm')))a.classList.remove('open')});
 /* ===== Tự kiểm tra phiên bản mới trên GitHub Pages ===== */
-var APPV='2026.11.10-22';
+var APPV='2026.11.10-24';
 function checkUpdate(){if(!/^https?:/.test(location.protocol))return;fetch(location.pathname+'?nocache='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(t){var m=/var APPV='([^']+)'/.exec(t||'');if(!m||m[1]===APPV||$('#updbar'))return;
  var d=document.createElement('div');d.id='updbar';d.innerHTML='Đã có phiên bản mới của ứng dụng. <button class="btn p" onclick="location.replace(location.pathname+\'?v='+m[1]+'\'+location.hash)">Cập nhật ngay</button>';document.body.appendChild(d)}).catch(function(){})}
 setTimeout(checkUpdate,4000);setInterval(function(){if(!document.hidden)checkUpdate()},15*60*1000);document.addEventListener('visibilitychange',function(){if(!document.hidden)checkUpdate()});
@@ -1767,7 +1767,7 @@ function openNotif(){if(!ROLE||ROLE==='guest')return;var st=notifState(),ad=isAd
  if(!syncOn()){$('#nt_list').textContent='—';return}
  sget('action=inbox&user='+encodeURIComponent(ROLE)+'&since=0').then(function(r){var it=(r.items||[]).slice().reverse();$('#nt_list').innerHTML=it.length?it.slice(0,15).map(function(x){return '<div class="nt-it"><b>'+esc(x.title)+'</b><span>'+esc(fdt(x.t))+'</span><div>'+esc(x.body).replace(/\n/g,'<br>')+'</div></div>'}).join(''):'Chưa có thông báo nào.'},function(){$('#nt_list').textContent='Không tải được (máy chủ chưa cập nhật mã mới?).'});
  if(ad)spost({action:'pushStatus'}).then(function(r){if(!r.ok)return;ACCS.forEach(function(a){var e=$('#nt_d_'+a[0]);if(e){var d=(r.subs||{})[a[0]]||[];e.textContent=d.length?'· 📱 '+d[0].dev:'· chưa bật'}})}).catch(function(){})}
-var GASV='2026.11.10e';
+var GASV='2026.11.10g';
 function ntDiag(){var L=[],ok=function(b,t){return '<li>'+(b?'✅ ':'⚠️ ')+t+'</li>'},put=function(){var e=$('#nt_diag');if(e)e.innerHTML=L.join('')};
  L.push(ok(syncOn(),syncOn()?'Đã kết nối Đồng bộ online.':'Chưa kết nối Đồng bộ online – thông báo đẩy cần máy chủ.'));
  L.push(ok(pushSupported(),pushSupported()?'Trình duyệt hỗ trợ thông báo đẩy.':'Trình duyệt / chế độ mở này không hỗ trợ (cần mở bằng link https, Chrome / Safari mới).'));
@@ -2620,7 +2620,7 @@ navIcons();(function(){var v=null;try{v=localStorage.getItem('bts_skin_v2')}catc
  * - Lưu dữ liệu chung của mọi thiết bị vào thư mục Google Drive bên dưới (file du-lieu-ibs.json).
  * - Mỗi lần lưu tăng số phiên bản, giữ lịch sử các phiên bản gần nhất (thư mục "Lich su").
  * - Hồ sơ PDF / ảnh lưu trong thư mục "Ho so"; file dữ liệu (PDF, Excel, Word) của mục Thư mục Data lưu trong thư mục "Data".
- * - Mỗi ngày tạo một bản sao lưu đầy đủ (thư mục "Hang ngay") và gửi email kèm file.
+ * - Mỗi ngày lúc 18:00 tự tạo một bản sao lưu đầy đủ (thư mục "Hang ngay") và gửi email kèm file (hàm saoLuuHangNgay, lịch tự cài).
  * - Vẫn nhận kiểu sao lưu cũ (Sao lưu tự động) để tương thích.
  * - AI (Claude) đọc PDF hợp đồng / hóa đơn để điền dữ liệu chính xác hơn (cần khóa API, xem phần cuối file). (cần khóa API, xem phần cuối file).
  * - Gửi THÔNG BÁO ĐẨY tới điện thoại/máy tính đã cài ứng dụng (giao việc, đổi hạn, hoàn thành, nhắc việc 7h sáng, Admin gửi tin).
@@ -2631,8 +2631,9 @@ const FOLDER = 'Du lieu Quan ly nha tram IBS';
 const KEEP_HISTORY = 60;                    // Số phiên bản lịch sử giữ lại
 const KEEP_DAILY = 30;                      // Số bản sao lưu hằng ngày giữ lại
 const SEND_EMAIL_DAILY = true;
+const DAILY_HOUR = 18;                      // Giờ tự động sao lưu + gửi email mỗi ngày (giờ Việt Nam). Google chạy trong khoảng 18:00 – 18:15
 const DATA_FILE = 'du-lieu-ibs.json';
-const CODE_VER = '2026.11.10e';
+const CODE_VER = '2026.11.10g';
 const MIN_APPV = '2026.11.10-22';            // bản ứng dụng cũ hơn bản này không được ghi dữ liệu chung (bản cũ có lỗi gộp làm mất ô hợp đồng)                // phiên bản mã máy chủ – ứng dụng dùng để báo khi máy chủ chưa cập nhật
 
 function doGet(e) {
@@ -2643,6 +2644,8 @@ function doGet(e) {
   const meta = { ok: true, version: Number(pr.getProperty('version') || 0), updatedAt: pr.getProperty('updatedAt') || '', updatedBy: pr.getProperty('updatedBy') || '', gz: true, ai: !!aiKey_(), codeVer: CODE_VER, now: Date.now() };
   const ld = Number(pr.getProperty('lastDaily') || 0);
   if (ld) meta.lastDaily = new Date(ld).toISOString();
+  if (pr.getProperty('trigV') !== CODE_VER) { ensureTrigger_(); pr.setProperty('trigV', CODE_VER); }   // cài lịch tự động khi có mã mới
+  meta.dailyHour = pr.getProperty('dailyTrig') ? DAILY_HOUR : -1;
   if (p.action === 'meta') return out(meta);
   if (p.action === 'load') {
     const f = findFile_(root_(), DATA_FILE);
@@ -2730,8 +2733,9 @@ function save_(req) {
         }
       }
     } catch (e) {}
+    // Sao lưu hằng ngày chạy theo lịch DAILY_HOUR (saoLuuHangNgay). Chỉ dự phòng khi lịch chưa cài được và đã quá 26 giờ chưa sao lưu
     const last = Number(pr.getProperty('lastDaily') || 0);
-    if (now.getTime() - last > 20 * 3600 * 1000) {
+    if (!pr.getProperty('dailyTrig') && now.getTime() - last > 26 * 3600 * 1000) {
       daily_(root, txt, ts, req.data || {});
       pr.setProperty('lastDaily', String(now.getTime()));
       cleanFiles_(req.data || {});
@@ -2811,15 +2815,60 @@ function daily_(root, txt, ts, d, prefix, keep) {
   try { df.setDescription(JSON.stringify(stat_(d))); } catch (e) {}
   cleanup_(fo, px, keep || KEEP_DAILY);
   if (SEND_EMAIL_DAILY && txt.length < 20 * 1024 * 1024) {
+    const pr = PropertiesService.getScriptProperties(), since = Number(pr.getProperty('lastMailFiles') || 0), t0 = Date.now();
+    let hs = { n: 0, inZip: 0, zip: null, links: [], size: 0 };
+    try { hs = newFilesZip_(root, d, since, MAIL_MAX - txt.length - 512 * 1024, ts); } catch (e) { hs.err = e.message; }
+    const att = [Utilities.newBlob(txt, 'application/json', 'sao-luu-ibs_' + ts + '.json')];
+    if (hs.zip) att.push(hs.zip);
+    let hoSo = '';
+    try { hoSo = filesFolder_().getUrl(); } catch (e) {}
     MailApp.sendEmail({
       to: EMAIL,
       subject: 'Sao lưu Quản lý nhà trạm IBS - ' + ts,
       body: 'Bản sao lưu hằng ngày (dữ liệu chung đồng bộ online).\nSố trạm: ' + ((d.sites || []).length) +
-            '\nSố hồ sơ PDF/ảnh: ' + ((d.files || []).length) + ' (file gốc lưu trong thư mục Drive "' + FOLDER + '/Ho so")' +
-            '\n\nKhôi phục: mở ứng dụng > Sao lưu / nhập > Mở file sao lưu > Nhập dữ liệu.',
-      attachments: [Utilities.newBlob(txt, 'application/json', 'sao-luu-ibs_' + ts + '.json')]
+            '\nTổng số hồ sơ PDF/ảnh: ' + ((d.files || []).length) + ' (file gốc lưu trong thư mục Drive "' + FOLDER + '/Ho so"' + (hoSo ? ': ' + hoSo : '') + ')' +
+            '\n\nFile đính kèm email này:' +
+            '\n - sao-luu-ibs_' + ts + '.json: toàn bộ dữ liệu đã nhập, khai báo (trạm, hợp đồng, hóa đơn, công việc…).' +
+            (hs.zip ? '\n - ' + hs.zip.getName() + ': ' + hs.inZip + ' hồ sơ đính kèm ' + (since ? 'mới / cập nhật từ lần sao lưu trước' : '(lần đầu: toàn bộ hồ sơ trong giới hạn dung lượng email)') + ', xếp theo Mã trạm / Loại hồ sơ / Tên file.' :
+              '\n - Không có hồ sơ đính kèm mới' + (since ? ' từ lần sao lưu trước.' : '.')) +
+            (hs.links.length ? '\n\n' + hs.links.length + ' hồ sơ mới vượt giới hạn 25 MB của email, tải tại Google Drive:\n' + hs.links.slice(0, 200).join('\n') + (hs.links.length > 200 ? '\n… và ' + (hs.links.length - 200) + ' file khác trong thư mục Ho so.' : '') : '') +
+            (hs.err ? '\n\n(Lỗi khi gom hồ sơ: ' + hs.err + ')' : '') +
+            '\n\nKhôi phục dữ liệu: mở ứng dụng > Đồng bộ > 🕘 Khôi phục dữ liệu cũ > Chọn file sao lưu (.json).',
+      attachments: att
     });
+    if (!hs.err) pr.setProperty('lastMailFiles', String(t0));
   }
+}
+
+// Gom hồ sơ đính kèm (thư mục Ho so + Data) tạo sau mốc "since" thành 1 file zip, tối đa "room" byte; phần vượt trả về dạng link Drive
+const MAIL_MAX = 24 * 1024 * 1024;   // Gmail nhận tối đa 25 MB mỗi email
+const HS_CAT = { cdt: 'HD voi CDT', dt: 'HD voi Doi tac', mb: 'HD Mobifone', vt: 'HD Viettel', vn: 'HD Vinaphone', pl: 'Phap ly - GPXD', cv: 'Cong viec', bdnt: 'Bao duong nha tram', khac: 'Khac', data: 'Thu muc Data', mau: 'Mau bien ban' };
+function newFilesZip_(root, d, since, room, ts) {
+  const meta = {}, codes = {}, list = [], used = {}, blobs = [], links = [];
+  (d.files || []).forEach(function (f) { meta[String(f.id)] = f; });
+  (d.sites || []).forEach(function (x) { codes[x.id] = String(x.code || ('tram-' + x.id)); });
+  [filesFolder_(), sub_(root, 'Data')].forEach(function (fo) {
+    const it = fo.getFiles();
+    while (it.hasNext()) {
+      const f = it.next();
+      if (f.isTrashed()) continue;
+      const m = meta[f.getName()];
+      if (!m || f.getDateCreated().getTime() <= since) continue;
+      list.push({ f: f, m: m, t: f.getDateCreated().getTime() });
+    }
+  });
+  list.sort(function (a, b) { return a.t - b.t; });
+  const clean = function (v) { return String(v || '').replace(/[\\\/:*?"<>|\u0000-\u001f]/g, '_').trim().slice(0, 120) || 'file'; };
+  let size = 0;
+  list.forEach(function (o) {
+    let path = clean(codes[o.m.sid] || (o.m.cat === 'data' ? 'Thu muc Data' : 'Chung')) + '/' + clean(HS_CAT[o.m.cat] || o.m.cat || 'Khac') + '/' + clean(o.m.name || o.f.getName());
+    if (used[path]) { let k = 2; while (used[path.replace(/(\.[^.\/]*)?$/, ' (' + k + ')$1')]) k++; path = path.replace(/(\.[^.\/]*)?$/, ' (' + k + ')$1'); }
+    used[path] = 1;
+    const sz = o.f.getSize();
+    if (size + sz <= room) { blobs.push(o.f.getBlob().copyBlob().setName(path)); size += sz; }
+    else links.push(path + ': ' + o.f.getUrl());
+  });
+  return { n: list.length, inZip: blobs.length, size: size, links: links, zip: blobs.length ? Utilities.zip(blobs, 'ho-so-moi_' + ts + '.zip') : null };
 }
 
 // Xóa (cho vào thùng rác) file hồ sơ không còn được dữ liệu tham chiếu, tạo trước đó hơn 1 ngày
@@ -2959,8 +3008,33 @@ function nhacViecHangNgay() {
   if (overdue || exp) out.push({ to: 'admin', title: '📊 Tổng hợp sáng nay', body: (overdue ? overdue + ' việc quá hạn. ' : '') + (exp ? exp + ' hợp đồng hết hạn trong 30 ngày tới.' : ''), url: './' });
   pushNotify_(out);
 }
-function ensureTrigger_() { try { if (!ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'nhacViecHangNgay'; }))
-  ScriptApp.newTrigger('nhacViecHangNgay').timeBased().atHour(7).everyDays(1).inTimezone('Asia/Ho_Chi_Minh').create(); } catch (e) {} }
+function ensureTrigger_() {
+  try {
+    const ts = ScriptApp.getProjectTriggers(), has = function (h) { return ts.some(function (t) { return t.getHandlerFunction() === h; }); };
+    if (!has('nhacViecHangNgay')) ScriptApp.newTrigger('nhacViecHangNgay').timeBased().atHour(7).everyDays(1).inTimezone('Asia/Ho_Chi_Minh').create();
+    if (!has('saoLuuHangNgay')) ScriptApp.newTrigger('saoLuuHangNgay').timeBased().atHour(DAILY_HOUR).nearMinute(0).everyDays(1).inTimezone('Asia/Ho_Chi_Minh').create();
+    PropertiesService.getScriptProperties().setProperty('dailyTrig', String(DAILY_HOUR));
+  } catch (e) {}
+}
+// Chạy tay 1 lần trong trình soạn Apps Script (chọn hàm này → Chạy) để cấp quyền và cài lịch: nhắc việc 7:00, sao lưu + email 18:00
+function caiDatLichTuDong() {
+  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'saoLuuHangNgay') ScriptApp.deleteTrigger(t); });   // cài lại theo DAILY_HOUR hiện tại
+  ensureTrigger_();
+  return 'Đã cài lịch: sao lưu + gửi email mỗi ngày lúc ' + DAILY_HOUR + ':00, nhắc việc lúc 7:00 (giờ Việt Nam).';
+}
+// Lịch hằng ngày: sao lưu đầy đủ vào "Hang ngay" và gửi email kèm file
+function saoLuuHangNgay() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(60000)) return;
+  try {
+    const root = root_(), f = findFile_(root, DATA_FILE);
+    if (!f) return;
+    const txt = f.getBlob().getDataAsString('UTF-8'), now = new Date(), d = JSON.parse(txt);
+    daily_(root, txt, Utilities.formatDate(now, 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd_HH-mm-ss'), d);
+    PropertiesService.getScriptProperties().setProperty('lastDaily', String(now.getTime()));
+    try { cleanFiles_(d); } catch (e) {}
+  } finally { lock.releaseLock(); }
+}
 function pushGet_(p) {
   if (p.action === 'vapid') return out({ ok: true, key: vapidKeys_().pub });
   if (p.action === 'inbox') { const o = pushLoad_(), since = Number(p.since || 0); return out({ ok: true, items: (o.inbox[p.user] || []).filter(function (x) { return x.t > since; }) }); }
