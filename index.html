@@ -738,7 +738,7 @@ function saveLog(eid){if(!can('log'))return;var lo=eid?L.filter(function(l){retu
  if(!lg.val&&!lg.note){$('#err').textContent='Nhập giá trị hoặc ghi chú.';return}
  if(lo){var ch=[];[['sid','Trạm'],['date','Ngày'],['type','Loại'],['val','Giá trị'],['note','Ghi chú']].forEach(function(f){var a=String(lo[f[0]]==null?'':lo[f[0]]),b=String(lg[f[0]]);if(a!==b)ch.push({f:f[1],o:f[0]==='date'?fmt2(a):f[0]==='sid'?(site(lo.sid)||{}).code:a,n:f[0]==='date'?fmt2(b):f[0]==='sid'?(site(lg.sid)||{}).code:b})});['prevLast','by','cr'].forEach(function(k){if(lo[k]!=null)lg[k]=lo[k]});L=L.map(function(l){return l.id===lo.id?lg:l});if(ch.length)audit(lg.sid,'Sửa nhật ký vận hành',ch);save();close_();render();return}
  L.push(lg);audit(lg.sid,'Thêm nhật ký vận hành',fmt(d)+' · '+lg.type+(lg.val?': '+lg.val:'')+(lg.note?' · '+lg.note:''));save();close_();render()}
-function openBackup(){if(!can('sys'))return;BKTXT='';show('<h2 style="margin-top:0">Sao lưu và nhập dữ liệu</h2><p class="m">Dữ liệu lưu trong trình duyệt này. Sao chép đoạn dưới để lưu ra file, hoặc dán dữ liệu cũ rồi bấm Nhập dữ liệu (thay toàn bộ dữ liệu hiện tại).</p><textarea id="bk" rows="12" oninput="BKTXT=\'\'">'+esc(JSON.stringify({sites:S,logs:L,inv:INV,elec:EL,eq:EQ,jobs:JB,bm:BM,acl:ACL},null,1))+'</textarea><div class="m" id="err" style="margin-top:6px"></div><div class="act"><button class="btn" onclick="close_()">Đóng</button><button class="btn" onclick="expSites()">Xuất danh sách trạm (CSV)</button><button class="btn" onclick="copyBk()">Sao chép</button><button class="btn" onclick="dl(\'sao-luu-ibs-\'+iso(today())+\'.json\',JSON.stringify({sites:S,logs:L,audit:A,inv:INV,elec:EL,eq:EQ,jobs:JB,bm:BM,acl:ACL}),\'application/json\')">Tải file sao lưu</button><button class="btn" onclick="bkFull()">Tải sao lưu kèm hồ sơ PDF</button><button class="btn adm m-sys" onclick="openSync()">Đồng bộ &amp; sao lưu online</button><button class="btn adm m-sys" onclick="$(\'#bkf\').click()">Mở file sao lưu</button><input type="file" id="bkf" accept=".json,application/json" hidden onchange="bkFile(this)"><button class="btn p adm m-sys" onclick="two(this,impBk)">Nhập dữ liệu</button></div>')}
+function openBackup(){if(!can('sys'))return;BKTXT='';show('<h2 style="margin-top:0">Sao lưu và nhập dữ liệu</h2><p class="m">Dữ liệu lưu trong trình duyệt này. Sao chép đoạn dưới để lưu ra file, hoặc dán dữ liệu cũ rồi bấm Nhập dữ liệu (thay toàn bộ dữ liệu hiện tại).</p><textarea id="bk" rows="12" oninput="BKTXT=\'\'">'+esc(JSON.stringify({sites:S,logs:L,inv:INV,elec:EL,eq:EQ,jobs:JB,bm:BM,acl:ACL},null,1))+'</textarea><div class="m" id="err" style="margin-top:6px"></div><div class="act"><button class="btn" onclick="close_()">Đóng</button><button class="btn" onclick="expSites()">Xuất danh sách trạm (CSV)</button><button class="btn" onclick="copyBk()">Sao chép</button><button class="btn" onclick="dl(\'sao-luu-ibs-\'+iso(today())+\'.json\',JSON.stringify({sites:S,logs:L,audit:A,inv:INV,elec:EL,eq:EQ,jobs:JB,bm:BM,acl:ACL}),\'application/json\')">Tải file sao lưu</button><button class="btn" onclick="bkFull()">Tải sao lưu kèm hồ sơ PDF</button><button class="btn adm m-sys" onclick="openSync()">Đồng bộ &amp; sao lưu online</button><button class="btn adm m-sys" onclick="rsOpen()">🕘 Khôi phục dữ liệu cũ</button><button class="btn adm m-sys" onclick="$(\'#bkf\').click()">Mở file sao lưu</button><input type="file" id="bkf" accept=".json,application/json" hidden onchange="bkFile(this)"><button class="btn p adm m-sys" onclick="two(this,impBk)">Nhập dữ liệu</button></div>')}
 function copyBk(){$('#bk').select();try{document.execCommand('copy');$('#err').textContent='Đã sao chép.'}catch(e){$('#err').textContent='Chọn toàn bộ nội dung và sao chép thủ công.'}}
 function impBk(){if(!can('sys'))return;try{var a=JSON.parse(BKTXT||$('#bk').value);if(Array.isArray(a))a={sites:a,logs:[]};if(!a||!Array.isArray(a.sites)||a.sites.some(function(x){return !x||typeof x!=='object'||!x.id||!x.code})||(a.logs&&!Array.isArray(a.logs)))throw 0;var ids={};if(a.sites.some(function(x){if(ids[x.id])return true;ids[x.id]=1})){$('#err').style.color='var(--bad)';$('#err').textContent='File sao lưu có mã định danh trạm bị trùng – không nhập được.';return}INV=Array.isArray(a.inv)?a.inv:[];EL=Array.isArray(a.elec)?a.elec:[];EQ=Array.isArray(a.eq)?a.eq:[];JB=Array.isArray(a.jobs)?a.jobs:[];BM=Array.isArray(a.bm)?a.bm:[];if(a.acl&&typeof a.acl==='object'&&isAdm()){try{localStorage.setItem('bts_acl_v1',JSON.stringify(a.acl))}catch(e){}loadACL()}S=a.sites;S.forEach(mig);fillInvAmt();L=a.logs||[];if(Array.isArray(a.audit))A=a.audit;audit(0,'Nhập dữ liệu từ sao lưu',a.sites.length+' trạm, '+L.length+' nhật ký'+(Array.isArray(a.files)?', '+a.files.length+' hồ sơ PDF':''));save();if(Array.isArray(a.files))restoreFiles(a.files);close_();render()}catch(e){$('#err').style.color='var(--bad)';$('#err').textContent='Dữ liệu không đúng định dạng.'}}
 $('#ov').addEventListener('click',function(e){if(e.target.id==='ov')close_()});
@@ -774,7 +774,8 @@ function fileCanF(f){return fileCan(f.cat,{tid:f.tid,bid:f.bid})}
 function loginOpts(){var sel=$('#lg_u'),cur=sel.value;sel.innerHTML=ACCS.filter(function(a){return a[0]==='admin'||(ACL[a[0]]&&ACL[a[0]].on)}).map(function(a){return '<option value="'+a[0]+'">'+esc(accName(a[0]))+' ('+roleHint(a[0])+')</option>'}).join('');if(cur&&sel.querySelector('option[value="'+cur+'"]'))sel.value=cur}
 function isAdm(){return ROLE==='admin'}
 function pwh(r){var o=ld('bts_pw')||{};return o[r]||DEFPW[r]}
-function applyRole(){var b=document.body;[].slice.call(b.classList).forEach(function(c){if(/^(no-e-|no-v-|role-)/.test(c))b.classList.remove(c)});b.classList.remove('guest');b.classList.toggle('is-admin',ROLE==='admin');
+function pendJoin(){var c=ld('bts_pendjoin');if(!c||!ROLE)return;syncLS('bts_pendjoin',null);if(!c.url||!c.token)return;setTimeout(function(){openSync();syncConnectUI(c);var e=$('#err');if(e)e.insertAdjacentHTML('afterbegin','<b>Bạn vừa mở link kết nối đồng bộ.</b> ');try{e.scrollIntoView({block:'center'})}catch(x){}},400)}
+function applyRole(){setTimeout(pendJoin,0);var b=document.body;[].slice.call(b.classList).forEach(function(c){if(/^(no-e-|no-v-|role-)/.test(c))b.classList.remove(c)});b.classList.remove('guest');b.classList.toggle('is-admin',ROLE==='admin');
  if(ROLE){b.classList.add('role-'+(ROLE==='admin'?'admin':ROLE==='vip'?'vip':/^tech/.test(ROLE)?'tech':'guest'));MODS.forEach(function(m){if(!can(m[0]))b.classList.add('no-e-'+m[0]);if(!see(m[0]))b.classList.add('no-v-'+m[0])});if(!see('jobm')&&!can('jobd'))b.classList.add('no-v-jobs');if(!see('bdnt')&&!see('ac'))b.classList.add('no-v-maint');var jlx=$('#jld');if(jlx&&jlx.dataset.role!==ROLE){jlx.dataset.role=ROLE||'';jlx.value='';if(/^tech/.test(ROLE))jlx.dataset.me='1';else delete jlx.dataset.me}}
  $('#login').hidden=!!ROLE;USER=ROLE?accName(ROLE):'';$('#who').textContent=ROLE?'Tài khoản: '+USER+' ('+roleHint(ROLE)+')':'';$('#accn').textContent=USER;$('#accr').textContent=ROLE?roleHint(ROLE):'';$('#av').textContent=avTxt(USER);
  var on=document.querySelector('nav button.on');if(on&&getComputedStyle(on).display==='none')tab(0);
@@ -1393,6 +1394,46 @@ function syncFullReload(b){if(b)b.disabled=true;syncMsg('Đang gửi thay đổi
   syncMsg(SYNC.lsFull?'Đã tải dữ liệu từ máy chủ (phiên bản '+sv.version+') nhưng bộ nhớ trình duyệt trên máy này ĐẦY nên chưa lưu lại được trên máy – mỗi lần mở ứng dụng sẽ tự tải lại. Nên xóa bớt dữ liệu trình duyệt / nhật ký cũ.':'Đã tải lại toàn bộ dữ liệu từ máy chủ (phiên bản '+sv.version+').',SYNC.lsFull?1:0)},function(e){if(b)b.disabled=false;syncMsg((e&&e.message)||String(e),1)})}
 /* sửa lỗi máy bị kẹt bản cũ do bộ nhớ đầy (bản trước 2026.11.10-19): tải lại toàn bộ 1 lần nếu máy không có thay đổi chưa gửi */
 (function(){try{if(!localStorage.getItem('bts_fix_full19')){localStorage.setItem('bts_fix_full19','1');if(SYNC.cfg&&!SYNC.dirty&&SYNC.ver>0){SYNC.ver=0;localStorage.setItem('bts_sync_ver','0')}}}catch(e){}})();
+/* ===== Khôi phục dữ liệu từ bản lịch sử trên máy chủ hoặc file sao lưu ===== */
+var RSD=null;
+function rsOpen(){if(!isAdm()){alert('Chỉ Admin được khôi phục dữ liệu.');return}RSD=null;
+ show('<h2 style="margin-top:0">🕘 Khôi phục dữ liệu</h2><p class="m">Lấy lại dữ liệu đã khai báo trước đó (hợp đồng, hóa đơn…) từ một bản cũ. Máy chủ tự giữ <b>60 phiên bản gần nhất</b> (mỗi lần lưu một bản) và <b>30 bản sao lưu hằng ngày</b>; bản hằng ngày cũng được gửi qua email. Trước khi khôi phục, ứng dụng tự tải về một file sao lưu dữ liệu hiện tại để có thể quay lại.</p>'
+ +'<div class="act" style="justify-content:flex-start;flex-wrap:wrap">'+(syncOn()?'<button class="btn p" id="rs_lb" onclick="rsList(this)">Xem các bản lịch sử trên máy chủ</button>':'')+'<button class="btn" onclick="$(\'#rs_f\').click()">Chọn file sao lưu (.json)</button><input type="file" id="rs_f" accept=".json,application/json" hidden onchange="rsFile(this)"></div>'
+ +'<div id="rs_list"></div><div id="rs_sel"></div><div class="m" id="err" style="margin-top:6px"></div><div class="act"><button class="btn" onclick="close_()">Đóng</button></div>')}
+function rsNorm(a){if(a&&a.data&&Array.isArray(a.data.sites))a=a.data;if(Array.isArray(a))a={sites:a};if(!a||!Array.isArray(a.sites)||a.sites.some(function(x){return !x||typeof x!=='object'||!x.id}))return null;return a}
+function rsCell(v,c){return '<td'+(v>c?' style="color:var(--ok);font-weight:700"':v<c?' style="color:var(--bad)"':'')+'>'+(v==null?'—':v)+'</td>'}
+function rsList(b){b.disabled=true;syncMsg('Đang lấy danh sách bản lịch sử trên máy chủ…');
+ sget('action=hist').then(function(r){b.disabled=false;if(!r||!r.ok||!Array.isArray(r.list))throw new Error((r&&r.error&&!/Thao tác không hợp lệ/.test(r.error))?r.error:'Máy chủ Google chưa cập nhật mã Apps Script mới (cần bản '+GASV+') nên chưa xem được danh sách. Cách khác ngay bây giờ: mở Google Drive (tài khoản chạy máy chủ) → thư mục "Du lieu Quan ly nha tram IBS" → "Lich su" hoặc "Hang ngay", tải một file .json về máy (hoặc lấy file đính kèm trong email "Sao lưu Quản lý nhà trạm IBS"), rồi bấm "Chọn file sao lưu".');
+  syncMsg('');var c=dataStat(snapData()),best=null;r.list.forEach(function(o){var s=o.st;if(s&&(!best||s.nm+s.cdt+s.inv>best.st.nm+best.st.cdt+best.st.inv))best=o});
+  $('#rs_list').innerHTML='<div class="box" style="overflow:auto;max-height:320px;margin-top:8px"><table><thead><tr><th>Bản</th><th>Thời gian</th><th>Trạm</th><th>Trạm có HĐ nhà mạng</th><th>Trạm có HĐ tòa nhà</th><th>Hóa đơn</th><th></th></tr></thead><tbody>'
+   +'<tr><td><b>Dữ liệu hiện tại</b></td><td></td><td>'+c.tram+'</td><td>'+c.nm+'</td><td>'+c.cdt+'</td><td>'+c.inv+'</td><td></td></tr>'
+   +r.list.map(function(o){var s=o.st||{},vn=/^v(\d+)_/.exec(o.name);return '<tr'+(o===best&&(s.nm>c.nm||s.cdt>c.cdt||s.inv>c.inv)?' style="background:rgba(46,160,67,.10)"':'')+'><td>'+(vn?'Phiên bản '+vn[1]:o.dir==='Hang ngay'?'Sao lưu '+(/^thu-cong/.test(o.name)?'bấm tay':'hằng ngày'):esc(o.name))+'</td><td class="nowrap">'+fdt(new Date(o.t).toISOString())+'</td>'+rsCell(s.tram,c.tram)+rsCell(s.nm,c.nm)+rsCell(s.cdt,c.cdt)+rsCell(s.inv,c.inv)+'<td><button class="btn" data-n="'+esc(o.name)+'" onclick="rsGet(this)">Chọn</button></td></tr>'}).join('')+'</tbody></table></div><p class="m">Số <b style="color:var(--ok)">xanh</b>: bản đó có nhiều hơn dữ liệu hiện tại. Dòng tô nền: bản có nhiều HĐ / hóa đơn nhất.'+(r.list.some(function(o){return !o.st})?' Một số bản cũ chưa tính số liệu (bấm lại để tính tiếp).':'')+'</p>'},
+ function(e){b.disabled=false;syncMsg((e&&e.message)||String(e),1)}).catch(function(e){b.disabled=false;syncMsg((e&&e.message)||String(e),1)})}
+function rsGet(b){var n=b.getAttribute('data-n');b.disabled=true;syncMsg('Đang tải bản '+n+'…');
+ var p=gzOK()?sget('action=histGet&gz=1&name='+encodeURIComponent(n)).then(function(r){if(!r||!r.gzd)return r;return new Response(new Blob([b64u8(r.gzd)]).stream().pipeThrough(new DecompressionStream('gzip'))).text().then(function(t){r.data=JSON.parse(t);delete r.gzd;return r})}):sget('action=histGet&name='+encodeURIComponent(n));
+ p.then(function(r){b.disabled=false;if(!r||!r.ok)throw new Error((r&&r.error)||'Không tải được');var d=rsNorm(r.data);if(!d)throw new Error('Bản này không đúng định dạng dữ liệu');syncMsg('');rsSel(n,d)}).catch(function(e){b.disabled=false;syncMsg((e&&e.message)||String(e),1)})}
+function rsFile(inp){var f=inp.files&&inp.files[0];inp.value='';if(!f)return;var rd=new FileReader();rd.onload=function(){var d=null;try{d=rsNorm(JSON.parse(rd.result))}catch(e){}if(!d){syncMsg('File không phải bản sao lưu dữ liệu của ứng dụng.',1);return}syncMsg('');rsSel(f.name,d)};rd.readAsText(f)}
+function rsSel(name,d){RSD={name:name,data:d};var c=dataStat(snapData()),s=dataStat(d),R=[['Số trạm','tram'],['Trạm có HĐ nhà mạng','nm'],['Trạm có HĐ tòa nhà','cdt'],['Hóa đơn','inv'],['Công việc','jobs']],pv=rsFill(snapData(),d,true);
+ $('#rs_sel').innerHTML='<div class="box" id="rs_box" style="padding:12px;margin-top:10px"><b>Bản đã chọn: '+esc(name)+'</b><table class="tbl" style="margin-top:6px"><tr><th></th><th>Hiện tại</th><th>Bản đã chọn</th></tr>'+R.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+c[r[1]]+'</td>'+rsCell(s[r[1]],c[r[1]])+'</tr>'}).join('')+'</table>'
+  +'<p class="m" style="margin:8px 0">Nếu điền lại: <b>'+pv.f+'</b> ô còn trống ở '+pv.sx+' trạm được lấy lại, thêm <b>'+pv.s+'</b> trạm thiếu và <b>'+pv.r+'</b> bản ghi (hóa đơn, chỉ số điện, công việc…) chưa có.</p>'
+  +'<div class="act" style="justify-content:flex-start;flex-wrap:wrap"><button class="btn p" onclick="two(this,function(){rsApply(\'fill\')},\'Bấm lại để điền lại dữ liệu thiếu\')">✚ Chỉ điền lại dữ liệu bị thiếu (an toàn, khuyên dùng)</button><button class="btn d" onclick="two(this,function(){rsApply(\'all\')},\'Bấm lại: THAY TOÀN BỘ dữ liệu hiện tại\')">Thay toàn bộ bằng bản này</button></div>'
+  +'<p class="m">"Điền lại dữ liệu bị thiếu" giữ nguyên mọi thứ đang có, chỉ lấy từ bản cũ những ô đang trống và những bản ghi chưa có. "Thay toàn bộ" đưa dữ liệu về đúng bản cũ (mất các thay đổi sau thời điểm đó).</p></div>';
+ try{$('#rs_box').scrollIntoView({block:'center'})}catch(e){}}
+function rsEmpty(v){return v==null||v===''||(Array.isArray(v)&&!v.length)}
+function rsFill(cur,bk,dry){var n={f:0,s:0,r:0,sx:0},byId={},byCode={},map={},nc=function(c){return String(c||'').trim().toUpperCase()};cur.sites=cur.sites||[];
+ cur.sites.forEach(function(x){byId[x.id]=x;if(x.code)byCode[nc(x.code)]=x});
+ var mx=cur.sites.reduce(function(m,x){return Math.max(m,Number(x.id)||0)},0);
+ bk.sites.forEach(function(b){var x=byId[b.id];if(x&&b.code&&x.code&&nc(x.code)!==nc(b.code))x=null;x=x||(b.code?byCode[nc(b.code)]:null);
+  if(!x){var nb=JSON.parse(JSON.stringify(b));if(byId[nb.id])nb.id=++mx;map[b.id]=nb.id;cur.sites.push(nb);byId[nb.id]=nb;n.s++;return}
+  map[b.id]=x.id;var k0=n.f;Object.keys(b).forEach(function(k){if(k==='id'||rsEmpty(b[k]))return;if(rsEmpty(x[k])){x[k]=JSON.parse(JSON.stringify(b[k]));n.f++}});if(n.f>k0)n.sx++});
+ ['inv','elec','eq','jobs','bm','logs'].forEach(function(k){cur[k]=cur[k]||[];var ids={};cur[k].forEach(function(o){if(o)ids[o.id]=1});(bk[k]||[]).forEach(function(o){if(o&&o.id!=null&&!ids[o.id]){var c=JSON.parse(JSON.stringify(o));if(c.sid!=null&&map[c.sid]!=null)c.sid=map[c.sid];cur[k].push(c);ids[o.id]=1;n.r++}})});
+ return n}
+function rsApply(mode){if(!isAdm()||!RSD)return;var bk=RSD.data,now=snapData();
+ try{dl('truoc-khi-khoi-phuc-'+iso(today())+'.json',JSON.stringify(now),'application/json')}catch(e){}
+ var n=null;if(mode==='fill'){n=rsFill(now,bk);S=now.sites;INV=now.inv;EL=now.elec;EQ=now.eq;JB=now.jobs;BM=now.bm;L=now.logs}
+ else{S=JSON.parse(JSON.stringify(bk.sites));INV=bk.inv||[];EL=bk.elec||[];EQ=bk.eq||[];JB=bk.jobs||[];BM=bk.bm||[];L=bk.logs||[];if(Array.isArray(bk.files)&&bk.files.length&&bk.files[0].data)restoreFiles(bk.files)}
+ S.forEach(mig);fillInvAmt();audit(0,'Khôi phục dữ liệu',(mode==='fill'?'Điền lại dữ liệu thiếu từ ':'Thay toàn bộ bằng ')+RSD.name+(n?': '+n.f+' ô, '+n.s+' trạm, '+n.r+' bản ghi':''));save();render();
+ syncMsg((mode==='fill'?'Đã điền lại '+n.f+' ô ở '+n.sx+' trạm, thêm '+n.s+' trạm và '+n.r+' bản ghi.':'Đã thay toàn bộ dữ liệu bằng bản '+RSD.name+'.')+(syncOn()?' Dữ liệu đang được gửi lên máy chủ để mọi máy cùng nhận.':'')+' File "truoc-khi-khoi-phuc" đã được tải về để có thể quay lại.');$('#rs_sel').innerHTML=''}
 function syncBadge(){var e=$('#sb');if(!e)return;e.style.color='';var set=function(t,full){e.textContent=t;e.title=(full||t)+' – bấm để xem chi tiết';e.dataset.st=t.charAt(0)==='✓'?'ok':t.charAt(0)==='⚠'?'err':t.charAt(0)==='○'?'off':'busy'};if(!syncOn()){set('○ Chưa kết nối','Đồng bộ online: chưa kết nối');return}
  if(SYNC.busy){set('⟳ Đang đồng bộ…');return}if(SYNC.err){set(SYNC.dirty?'⚠ Chưa gửi được':'⚠ Lỗi đồng bộ',SYNC.dirty?'Chưa gửi được thay đổi':'Lỗi đồng bộ: '+SYNC.err);e.style.color='#ffb4a8';if(!document.documentElement.dataset.skin)e.style.color='var(--bad)';return}
  set(SYNC.dirty?'● Chờ gửi…':'✓ Đồng bộ'+(SYNC.last?' '+fdt(SYNC.last).slice(11):''),SYNC.dirty?'Có thay đổi chờ gửi':'Đã đồng bộ'+(SYNC.last?' lúc '+fdt(SYNC.last):''))}
@@ -1406,7 +1447,7 @@ function openSync(){var on=syncOn(),ad=isAdm(),m=SYNC.srv;
  +(on?'<div class="kv" style="margin:8px 0 12px"><div><label>Trạng thái</label><div>'+esc($('#sb').textContent)+'</div></div><div><label>Phiên bản dữ liệu</label><div>Máy này: '+SYNC.ver+(m?' · Máy chủ: '+m.version:'')+'</div></div>'+(m&&m.updatedAt?'<div><label>Cập nhật gần nhất trên máy chủ</label><div>'+fdt(m.updatedAt)+(m.updatedBy?' · '+esc(m.updatedBy):'')+'</div></div>':'')+'</div>'+(SYNC.err?'<div class="notice">'+esc(SYNC.err)+'</div>':'')+(m&&m.codeVer!==GASV?'<div class="notice">⚠ Máy chủ Google đang chạy mã Apps Script '+(m.codeVer?'bản '+esc(m.codeVer):'CŨ')+' (bản mới nhất: '+GASV+'). Một số chức năng (thông báo đẩy, sửa lỗi mới) chưa chạy. Admin: dán mã mới (nút "Sao chép mã" bên dưới) → Triển khai → Quản lý các bản triển khai → bút chì → <b>Phiên bản mới</b> → Triển khai.</div>':'')+(fileErrs().length?'<div class="notice">Chưa tải được file lên máy chủ: '+esc(fileErrs().join('; '))+'. Dữ liệu khác vẫn đồng bộ bình thường; ứng dụng sẽ thử lại sau.</div>':''):'')
  +'<div class="sec">Kết nối bằng link / mã kết nối</div><p class="m" style="margin:6px 0">Dán link kết nối (hoặc mã kết nối) mà Admin gửi cho bạn.</p><div style="display:flex;gap:8px"><input id="sy_code" placeholder="https://...#ket-noi=... hoặc mã kết nối"><button class="btn p" onclick="syncByCode()">Kết nối</button></div>'
  +'<details style="margin-top:12px"'+(on?'':' open')+'><summary style="cursor:pointer;color:var(--pri)">Nhập thủ công URL máy chủ và mã bảo mật</summary><div class="grid" style="margin-top:8px">'+inp('sy_url','URL Web App (kết thúc bằng /exec)','text',on?SYNC.cfg.url:'')+inp('sy_tok','Mã bảo mật (TOKEN trong Apps Script)','password',on?SYNC.cfg.token:'')+'</div><div class="act" style="justify-content:flex-start"><button class="btn" onclick="syncByForm()">Lưu và kết nối</button></div></details>'
- +(on&&ad?'<div class="sec" style="margin-top:14px">Dành cho Admin</div><div class="act" style="justify-content:flex-start;flex-wrap:wrap"><button class="btn" onclick="copySyncLink()">Sao chép link kết nối cho thiết bị khác</button><button class="btn d" onclick="two(this,syncPushAll,\'Bấm lại để xác nhận đưa dữ liệu lên\')">Đưa dữ liệu máy này lên làm dữ liệu chung</button></div><p class="m">Gửi link kết nối riêng cho từng người qua Zalo / email (không đăng công khai). Nút "Đưa dữ liệu máy này lên" dùng khi khởi tạo lần đầu hoặc khi cần ghi đè toàn bộ dữ liệu trên máy chủ bằng dữ liệu của máy này.</p>':'')
+ +(on&&ad?'<div class="sec" style="margin-top:14px">Dành cho Admin</div><div class="act" style="justify-content:flex-start;flex-wrap:wrap"><button class="btn" onclick="copySyncLink()">Sao chép link kết nối cho thiết bị khác</button><button class="btn p" onclick="rsOpen()">🕘 Khôi phục dữ liệu cũ</button><button class="btn d" onclick="two(this,syncPushAll,\'Bấm lại để xác nhận đưa dữ liệu lên\')">Đưa dữ liệu máy này lên làm dữ liệu chung</button></div><p class="m">Gửi link kết nối riêng cho từng người qua Zalo / email (không đăng công khai). Nút "Đưa dữ liệu máy này lên" dùng khi khởi tạo lần đầu hoặc khi cần ghi đè toàn bộ dữ liệu trên máy chủ bằng dữ liệu của máy này.</p>':'')
  +(on?'<div class="sec" style="margin-top:14px">Sao lưu tự động</div><p class="m" style="margin:6px 0">Máy chủ tự sao lưu, không cần cài thêm: mỗi lần dữ liệu thay đổi lưu một phiên bản (Drive: <i>Du lieu Quan ly nha tram IBS/Lich su</i>, giữ 60 bản gần nhất); mỗi ngày một bản đầy đủ (thư mục <i>Hang ngay</i>, giữ 30 bản) và gửi email kèm file tới <b>tuanlm.vnn@gmail.com</b>. Hồ sơ PDF/ảnh lưu sẵn trong thư mục <i>Ho so</i>.'+(m&&m.lastDaily?'<br>Bản sao lưu hằng ngày gần nhất: <b>'+fdt(m.lastDaily)+'</b>':'')+'</p>'+(ad?'<div class="act" style="justify-content:flex-start"><button class="btn" onclick="syncBackupNow(this)">Sao lưu ngay và gửi email</button></div>':''):'<p class="m" style="margin-top:14px"><b>Sao lưu tự động</b> lên Google Drive và email hằng ngày sẽ chạy khi máy đã kết nối đồng bộ online.</p>')
  +(on?aiSyncHtml(m,ad):'')
  +'<details style="margin-top:12px"><summary style="cursor:pointer;color:var(--pri)">Hướng dẫn cài máy chủ đồng bộ (Admin làm 1 lần)</summary><ol class="m" style="padding-left:18px"><li>Đăng nhập Google bằng <b>tuanlm.vnn@gmail.com</b>, mở <b>script.google.com</b>. Có thể dùng lại dự án "Sao lưu" cũ hoặc tạo dự án mới.</li><li>Xóa mã cũ, dán toàn bộ mã bên dưới, đổi <b>TOKEN</b> thành chuỗi bí mật dài. Bấm Lưu.</li><li><b>Triển khai → Tùy chọn triển khai mới</b> (hoặc Quản lý triển khai → Sửa → Phiên bản mới) → <b>Ứng dụng web</b>, Thực thi với tư cách: <b>Tôi</b>, Ai có quyền truy cập: <b>Bất kỳ ai</b> → Triển khai, cấp quyền.</li><li>Dán URL /exec và TOKEN vào mục "Nhập thủ công" ở trên → Lưu và kết nối.</li><li>Lần đầu: bấm <b>Đưa dữ liệu máy này lên làm dữ liệu chung</b>. Sau đó <b>Sao chép link kết nối</b> gửi cho các thiết bị khác.</li></ol>'
@@ -1427,7 +1468,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){var a=$('#a
 function accToggle(ev){ev.stopPropagation();$('#acc').classList.toggle('open')}
 document.addEventListener('click',function(ev){var a=$('#acc');if(a&&a.classList.contains('open')&&!(ev.target.closest&&ev.target.closest('.accm select,#thm')))a.classList.remove('open')});
 /* ===== Tự kiểm tra phiên bản mới trên GitHub Pages ===== */
-var APPV='2026.11.10-20';
+var APPV='2026.11.10-21';
 function checkUpdate(){if(!/^https?:/.test(location.protocol))return;fetch(location.pathname+'?nocache='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(t){var m=/var APPV='([^']+)'/.exec(t||'');if(!m||m[1]===APPV||$('#updbar'))return;
  var d=document.createElement('div');d.id='updbar';d.innerHTML='Đã có phiên bản mới của ứng dụng. <button class="btn p" onclick="location.replace(location.pathname+\'?v='+m[1]+'\'+location.hash)">Cập nhật ngay</button>';document.body.appendChild(d)}).catch(function(){})}
 setTimeout(checkUpdate,4000);setInterval(function(){if(!document.hidden)checkUpdate()},15*60*1000);document.addEventListener('visibilitychange',function(){if(!document.hidden)checkUpdate()});
@@ -1693,7 +1734,7 @@ function openNotif(){if(!ROLE||ROLE==='guest')return;var st=notifState(),ad=isAd
  if(!syncOn()){$('#nt_list').textContent='—';return}
  sget('action=inbox&user='+encodeURIComponent(ROLE)+'&since=0').then(function(r){var it=(r.items||[]).slice().reverse();$('#nt_list').innerHTML=it.length?it.slice(0,15).map(function(x){return '<div class="nt-it"><b>'+esc(x.title)+'</b><span>'+esc(fdt(x.t))+'</span><div>'+esc(x.body).replace(/\n/g,'<br>')+'</div></div>'}).join(''):'Chưa có thông báo nào.'},function(){$('#nt_list').textContent='Không tải được (máy chủ chưa cập nhật mã mới?).'});
  if(ad)spost({action:'pushStatus'}).then(function(r){if(!r.ok)return;ACCS.forEach(function(a){var e=$('#nt_d_'+a[0]);if(e){var d=(r.subs||{})[a[0]]||[];e.textContent=d.length?'· 📱 '+d[0].dev:'· chưa bật'}})}).catch(function(){})}
-var GASV='2026.11.10c';
+var GASV='2026.11.10d';
 function ntDiag(){var L=[],ok=function(b,t){return '<li>'+(b?'✅ ':'⚠️ ')+t+'</li>'},put=function(){var e=$('#nt_diag');if(e)e.innerHTML=L.join('')};
  L.push(ok(syncOn(),syncOn()?'Đã kết nối Đồng bộ online.':'Chưa kết nối Đồng bộ online – thông báo đẩy cần máy chủ.'));
  L.push(ok(pushSupported(),pushSupported()?'Trình duyệt hỗ trợ thông báo đẩy.':'Trình duyệt / chế độ mở này không hỗ trợ (cần mở bằng link https, Chrome / Safari mới).'));
@@ -2504,7 +2545,9 @@ function anRun(){var o=$('#an_out');if(!o)return;var D=anData(),R=AN.range($('#a
  o.innerHTML=h||'<p class="m">Tài khoản không có quyền xem các mục phân tích.</p>'}
 
 function syncMsg(t,bad){var e=$('#err');if(e){e.style.color=bad?'var(--bad)':'var(--ok)';e.textContent=t}}
-function syncConnectUI(cfg,mode){if(!mode&&S.length&&A.some(function(e){return e.act!=='Xóa nhật ký thay đổi'})&&!(S.length&&S.every(function(x){return x.note==='Dữ liệu mẫu'}))){syncMsg('');$('#err').innerHTML='Máy này đang có <b>'+S.length+'</b> trạm và dữ liệu đã nhập. Khi kết nối:<div class="act" style="justify-content:flex-start;margin-top:6px"><button class="btn" id="sy_m1">Dùng dữ liệu trên máy chủ (bỏ dữ liệu máy này)</button><button class="btn p" id="sy_m2">Gộp dữ liệu máy này vào máy chủ</button></div>';$('#err').style.color='';$('#sy_m1').onclick=function(){syncConnectUI(cfg,'server')};$('#sy_m2').onclick=function(){syncConnectUI(cfg,'merge')};return}
+function hasOwnData(){return S.length>0&&!S.every(function(x){return x.note==='Dữ liệu mẫu'})}
+function syncConnectUI(cfg,mode){if(mode==='server'&&hasOwnData()){try{dl('truoc-khi-ket-noi-'+iso(today())+'.json',JSON.stringify(snapData()),'application/json')}catch(e){}}   // bỏ dữ liệu máy này → tự tải bản sao lưu về trước
+ if(!mode&&hasOwnData()){syncMsg('');$('#err').innerHTML='Máy này đang có <b>'+S.length+'</b> trạm và dữ liệu đã nhập. Khi kết nối:<div class="act" style="justify-content:flex-start;margin-top:6px"><button class="btn" id="sy_m1">Dùng dữ liệu trên máy chủ (bỏ dữ liệu máy này – tự tải file sao lưu về trước)</button><button class="btn p" id="sy_m2">Gộp dữ liệu máy này vào máy chủ</button></div>';$('#err').style.color='';$('#sy_m1').onclick=function(){syncConnectUI(cfg,'server')};$('#sy_m2').onclick=function(){syncConnectUI(cfg,'merge')};return}
  if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(cfg.url)){syncMsg('URL phải là địa chỉ Web App của Google Apps Script (https://script.google.com/...).',1);return}if(!cfg.token){syncMsg('Nhập mã bảo mật.',1);return}
  syncMsg('Đang kết nối…');syncConnect(cfg,mode).then(function(){if(SYNC.err){syncMsg('Không kết nối được: '+SYNC.err,1);return}var v=SYNC.srv?SYNC.srv.version:0,t=v?'Đã kết nối và tải dữ liệu chung (phiên bản '+v+').':'Đã kết nối. Máy chủ chưa có dữ liệu'+(isAdm()?' – bấm "Đưa dữ liệu máy này lên làm dữ liệu chung" để khởi tạo.':' – nhờ Admin khởi tạo dữ liệu.');if($('#sy_code')){openSync();syncMsg(t)}})}
 function syncByCode(){var c=parseSyncCode($('#sy_code').value);if(!c){syncMsg('Link hoặc mã kết nối không hợp lệ.',1);return}syncConnectUI(c)}
@@ -2514,7 +2557,7 @@ function copySyncLink(){var l=syncLink();var done=function(){syncMsg('Đã sao c
 function syncPushAll(){if(!isAdm()||!syncOn())return;syncMsg('Đang tải dữ liệu lên máy chủ…');SYNC.up={};saveUp();
  uploadPending().then(function(){return sget('action=meta')}).then(function(m){if(typeof m.version!=='number')throw new Error(OLDGAS);var d=snapData();return spost({action:'save',base:m.version,data:d,user:USER}).then(function(r){if(r.conflict)throw new Error('Có người vừa cập nhật dữ liệu, bấm lại để thử.');setBase(d,r.version);SYNC.dirty=false;syncLS('bts_sync_dirty',null);SYNC.srv={version:r.version,updatedAt:new Date().toISOString(),updatedBy:USER};audit(0,'Khởi tạo dữ liệu đồng bộ online','Đưa toàn bộ dữ liệu máy này lên máy chủ (phiên bản '+r.version+')');syncBadge();syncMsg('Đã đưa dữ liệu lên máy chủ (phiên bản '+r.version+'). Giờ có thể gửi link kết nối cho các thiết bị khác.')})})
  .catch(function(e){syncMsg('Không tải lên được: '+(e.message||e),1)})}
-(function(){var h=location.hash||'';if(h.indexOf('ket-noi=')>=0){var c=parseSyncCode(h);if(c){SYNC.cfg=c;syncLS('bts_sync',c);setBase(null,0);SYNC.dirty=false;syncLS('bts_sync_dirty',null);SYNC.up={};saveUp();SYNC.joinedByLink=1;syncLS('bts_sync_join','1')}try{history.replaceState(null,'',location.href.split('#')[0])}catch(e){}}})();
+(function(){var h=location.hash||'';if(h.indexOf('ket-noi=')>=0){var c=parseSyncCode(h),s0=ld(K);if(c&&Array.isArray(s0)&&s0.length&&!s0.every(function(x){return x&&x.note==='Dữ liệu mẫu'})&&!(SYNC.cfg&&SYNC.cfg.url===c.url)){syncLS('bts_pendjoin',c);c=null}if(c){SYNC.cfg=c;syncLS('bts_sync',c);setBase(null,0);SYNC.dirty=false;syncLS('bts_sync_dirty',null);SYNC.up={};saveUp();SYNC.joinedByLink=1;syncLS('bts_sync_join','1')}try{history.replaceState(null,'',location.href.split('#')[0])}catch(e){}}})();
 try{if(!SYNC.joinedByLink&&localStorage.getItem('bts_sync_join')&&SYNC.ver===0)SYNC.joinedByLink=1}catch(e){}
 pollSched(30000);window.addEventListener('focus',pollWake);window.addEventListener('online',function(){POLL.last=0;pollWake()});
 
@@ -2545,7 +2588,7 @@ const KEEP_HISTORY = 60;                    // Số phiên bản lịch sử gi�
 const KEEP_DAILY = 30;                      // Số bản sao lưu hằng ngày giữ lại
 const SEND_EMAIL_DAILY = true;
 const DATA_FILE = 'du-lieu-ibs.json';
-const CODE_VER = '2026.11.10c';                // phiên bản mã máy chủ – ứng dụng dùng để báo khi máy chủ chưa cập nhật
+const CODE_VER = '2026.11.10d';                // phiên bản mã máy chủ – ứng dụng dùng để báo khi máy chủ chưa cập nhật
 
 function doGet(e) {
   const p = (e && e.parameter) || {};
@@ -2561,6 +2604,16 @@ function doGet(e) {
     const txt = f ? f.getBlob().getDataAsString('UTF-8') : '';
     if (p.gz === '1' && txt) meta.gzd = Utilities.base64Encode(Utilities.gzip(Utilities.newBlob(txt, 'application/json')).getBytes());  // gửi nén
     else meta.data = txt ? JSON.parse(txt) : null;
+    return out(meta);
+  }
+  if (p.action === 'hist') return histList_();
+  if (p.action === 'histGet') {
+    const f = histFind_(String(p.name || ''));
+    if (!f) return out({ ok: false, error: 'Không tìm thấy bản lịch sử' });
+    const htxt = f.getBlob().getDataAsString('UTF-8');
+    if (p.gz === '1') meta.gzd = Utilities.base64Encode(Utilities.gzip(Utilities.newBlob(htxt, 'application/json')).getBytes());
+    else meta.data = JSON.parse(htxt);
+    meta.name = f.getName();
     return out(meta);
   }
   if (p.action === 'file') {
@@ -2616,7 +2669,8 @@ function save_(req) {
     pr.setProperties({ version: String(v), updatedAt: now.toISOString(), updatedBy: String(req.user || '') });
     const ts = Utilities.formatDate(now, 'Asia/Ho_Chi_Minh', 'yyyy-MM-dd_HH-mm-ss');
     const hist = sub_(root, 'Lich su');
-    hist.createFile('v' + v + '_' + ts + '.json', txt, 'application/json');
+    const hf = hist.createFile('v' + v + '_' + ts + '.json', txt, 'application/json');
+    try { hf.setDescription(JSON.stringify(stat_(req.data))); } catch (e) {}
     cleanup_(hist, 'v', KEEP_HISTORY);
     const last = Number(pr.getProperty('lastDaily') || 0);
     if (now.getTime() - last > 20 * 3600 * 1000) {
@@ -2632,6 +2686,56 @@ function save_(req) {
   return res;
 }
 
+// ===== Khôi phục: danh sách bản lịch sử ("Lich su") và sao lưu hằng ngày ("Hang ngay") =====
+// Số liệu tóm tắt của một bản dữ liệu: số trạm, trạm có HĐ nhà mạng, trạm có HĐ tòa nhà, số hóa đơn
+function stat_(d) {
+  d = d || {};
+  const s = d.sites || [];
+  let nm = 0, cdt = 0;
+  s.forEach(function (x) {
+    let a = false, b = !!x.cdtName;
+    Object.keys(x || {}).forEach(function (k) {
+      if (!x[k]) return;
+      if (/^(mb|vt|vn)_(hd|end|plEnd)\d*$/.test(k)) a = true;
+      if (/^cdt(Hd|End|PlEnd)\d*$/.test(k)) b = true;
+    });
+    if (a) nm++;
+    if (b) cdt++;
+  });
+  return { tram: s.length, nm: nm, cdt: cdt, inv: (d.inv || []).length };
+}
+function histList_() {
+  const root = root_(), list = [], t0 = Date.now();
+  ['Lich su', 'Hang ngay'].forEach(function (dir) {
+    const it = sub_(root, dir).getFiles();
+    while (it.hasNext()) {
+      const f = it.next();
+      if (f.isTrashed() || !/\.json$/.test(f.getName())) continue;
+      list.push({ name: f.getName(), dir: dir, t: f.getDateCreated().getTime(), f: f });
+    }
+  });
+  list.sort(function (a, b) { return b.t - a.t; });
+  list.forEach(function (o) {
+    let st = null;
+    try { st = JSON.parse(o.f.getDescription() || 'null'); } catch (e) {}
+    if (!st && Date.now() - t0 < 20000) {          // bản cũ chưa có số liệu: tính và ghi lại (giới hạn thời gian)
+      try { st = stat_(JSON.parse(o.f.getBlob().getDataAsString('UTF-8'))); o.f.setDescription(JSON.stringify(st)); } catch (e) {}
+    }
+    o.st = st;
+    delete o.f;
+  });
+  return out({ ok: true, list: list });
+}
+function histFind_(name) {
+  if (!/^[\w.\-]{1,80}\.json$/.test(name)) return null;
+  const root = root_(), dirs = ['Lich su', 'Hang ngay'];
+  for (let i = 0; i < dirs.length; i++) {
+    const it = sub_(root, dirs[i]).getFilesByName(name);
+    while (it.hasNext()) { const f = it.next(); if (!f.isTrashed()) return f; }
+  }
+  return null;
+}
+
 // Sao lưu ngay (Admin bấm trong ứng dụng): lưu bản đầy đủ vào "Hang ngay" và gửi email
 function backupNow_() {
   const root = root_(), f = findFile_(root, DATA_FILE);
@@ -2645,7 +2749,8 @@ function backupNow_() {
 
 function daily_(root, txt, ts, d, prefix, keep) {
   const fo = sub_(root, 'Hang ngay'), px = prefix || 'hang-ngay_';
-  fo.createFile(px + ts + '.json', txt, 'application/json');
+  const df = fo.createFile(px + ts + '.json', txt, 'application/json');
+  try { df.setDescription(JSON.stringify(stat_(d))); } catch (e) {}
   cleanup_(fo, px, keep || KEEP_DAILY);
   if (SEND_EMAIL_DAILY && txt.length < 20 * 1024 * 1024) {
     MailApp.sendEmail({
@@ -2970,4 +3075,5 @@ function aiScan_(req) {
   try { res = JSON.parse(txt); } catch (e) { return out({ ok: false, error: 'AI trả về dữ liệu không đọc được' }); }
   return out({ ok: true, kind: kind, r: res, model: j.model || AI_MODEL, usage: j.usage || null });
 }
+
 </script></body></html>
