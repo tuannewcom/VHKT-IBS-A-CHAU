@@ -2000,23 +2000,29 @@ function pushPost_(req) {
 }
 
 // ===== Ký VAPID (ES256 / ECDSA P-256) bằng JavaScript thuần – Apps Script không có sẵn =====
-const EC_P = BigInt('0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff');
-const EC_N = BigInt('0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551');
-const EC_GX = BigInt('0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296');
-const EC_GY = BigInt('0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5');
-function ecMod_(a, m) { const r = a % m; return r >= 0n ? r : r + m; }
-function ecInv_(a, m) { let t = 0n, nt = 1n, r = m, nr = ecMod_(a, m); while (nr) { const q = r / nr; [t, nt] = [nt, t - q * nt]; [r, nr] = [nr, r - q * nr]; } return ecMod_(t, m); }
+// (Apps Script không nhận cách viết 0n/1n nên dùng BigInt(...); khởi tạo khi cần để lỗi ở đây không ảnh hưởng phần đồng bộ)
+var EC_P, EC_N, EC_GX, EC_GY, B0_, B1_, B2_, B3_, B4_, B8_;
+function ecInit_() {
+  if (EC_P) return;
+  EC_P = BigInt('0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff');
+  EC_N = BigInt('0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551');
+  EC_GX = BigInt('0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296');
+  EC_GY = BigInt('0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5');
+  B0_ = BigInt(0); B1_ = BigInt(1); B2_ = BigInt(2); B3_ = BigInt(3); B4_ = BigInt(4); B8_ = BigInt(8);
+}
+function ecMod_(a, m) { const r = a % m; return r >= B0_ ? r : r + m; }
+function ecInv_(a, m) { let t = B0_, nt = B1_, r = m, nr = ecMod_(a, m); while (nr) { const q = r / nr; [t, nt] = [nt, t - q * nt]; [r, nr] = [nr, r - q * nr]; } return ecMod_(t, m); }
 // Toạ độ Jacobian [X,Y,Z]
-function ecDbl_(P) { const [X, Y, Z] = P; if (!Y) return [0n, 1n, 0n]; const p = EC_P;
-  const YY = Y * Y % p, S = 4n * X * YY % p, ZZ = Z * Z % p, M = 3n * (X - ZZ) * (X + ZZ) % p;
-  const X3 = ecMod_(M * M - 2n * S, p), Y3 = ecMod_(M * (S - X3) - 8n * YY * YY, p), Z3 = 2n * Y * Z % p; return [X3, Y3, Z3]; }
+function ecDbl_(P) { const [X, Y, Z] = P; if (!Y) return [B0_, B1_, B0_]; const p = EC_P;
+  const YY = Y * Y % p, S = B4_ * X * YY % p, ZZ = Z * Z % p, M = B3_ * (X - ZZ) * (X + ZZ) % p;
+  const X3 = ecMod_(M * M - B2_ * S, p), Y3 = ecMod_(M * (S - X3) - B8_ * YY * YY, p), Z3 = B2_ * Y * Z % p; return [X3, Y3, Z3]; }
 function ecAdd_(P, Q) { if (!P[2]) return Q; if (!Q[2]) return P; const p = EC_P;
   const Z1Z1 = P[2] * P[2] % p, Z2Z2 = Q[2] * Q[2] % p, U1 = P[0] * Z2Z2 % p, U2 = Q[0] * Z1Z1 % p,
     S1 = P[1] * Q[2] % p * Z2Z2 % p, S2 = Q[1] * P[2] % p * Z1Z1 % p;
-  if (U1 === U2) return S1 === S2 ? ecDbl_(P) : [0n, 1n, 0n];
+  if (U1 === U2) return S1 === S2 ? ecDbl_(P) : [B0_, B1_, B0_];
   const H = ecMod_(U2 - U1, p), R = ecMod_(S2 - S1, p), HH = H * H % p, HHH = H * HH % p, V = U1 * HH % p;
-  const X3 = ecMod_(R * R - HHH - 2n * V, p), Y3 = ecMod_(R * (V - X3) - S1 * HHH, p), Z3 = P[2] * Q[2] % p * H % p; return [X3, Y3, Z3]; }
-function ecMul_(k) { let R = [0n, 1n, 0n], Q = [EC_GX, EC_GY, 1n]; while (k > 0n) { if (k & 1n) R = ecAdd_(R, Q); Q = ecDbl_(Q); k >>= 1n; }
+  const X3 = ecMod_(R * R - HHH - B2_ * V, p), Y3 = ecMod_(R * (V - X3) - S1 * HHH, p), Z3 = P[2] * Q[2] % p * H % p; return [X3, Y3, Z3]; }
+function ecMul_(k) { let R = [B0_, B1_, B0_], Q = [EC_GX, EC_GY, B1_]; while (k > B0_) { if (k & B1_) R = ecAdd_(R, Q); Q = ecDbl_(Q); k >>= B1_; }
   const zi = ecInv_(R[2], EC_P), zi2 = zi * zi % EC_P; return [R[0] * zi2 % EC_P, R[1] * zi2 % EC_P * zi % EC_P]; }
 function bytesToBig_(b) { let h = '0x'; for (let i = 0; i < b.length; i++) h += ((b[i] & 255) + 256).toString(16).slice(1); return BigInt(h === '0x' ? '0' : h); }
 function bigToBytes_(n, len) { let h = n.toString(16); while (h.length < len * 2) h = '0' + h; const out = []; for (let i = 0; i < len; i++) { const v = parseInt(h.substr(i * 2, 2), 16); out.push(v > 127 ? v - 256 : v); } return out; }
@@ -2024,18 +2030,20 @@ function b64u_(bytes) { return Utilities.base64EncodeWebSafe(bytes).replace(/=+$
 function hmac_(key, msg) { return Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_SHA_256, msg, key); }
 // RFC 6979: k xác định từ khoá bí mật + băm, không cần bộ sinh số ngẫu nhiên
 function ecSign_(d, hashBytes) {
+  ecInit_();
   const z = bytesToBig_(hashBytes) % EC_N, x = bigToBytes_(d, 32), h1 = bigToBytes_(z, 32);
   let V = new Array(32).fill(1), K = new Array(32).fill(0);
   K = hmac_(K, V.concat([0], x, h1)); V = hmac_(K, V); K = hmac_(K, V.concat([1], x, h1)); V = hmac_(K, V);
   for (;;) { V = hmac_(K, V); const k = bytesToBig_(V);
-    if (k > 0n && k < EC_N) { const R = ecMul_(k), r = R[0] % EC_N; if (r) { const s = ecInv_(k, EC_N) * (z + r * d) % EC_N; if (s) return bigToBytes_(r, 32).concat(bigToBytes_(s, 32)); } }
+    if (k > B0_ && k < EC_N) { const R = ecMul_(k), r = R[0] % EC_N; if (r) { const s = ecInv_(k, EC_N) * (z + r * d) % EC_N; if (s) return bigToBytes_(r, 32).concat(bigToBytes_(s, 32)); } }
     K = hmac_(K, V.concat([0])); V = hmac_(K, V); }
 }
 function vapidKeys_() {
+  ecInit_();
   const pr = PropertiesService.getScriptProperties(); let d = pr.getProperty('vapidD'), pub = pr.getProperty('vapidPub');
   if (!d || !pub) {
     let seed = []; for (let i = 0; i < 4; i++) seed = seed.concat(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, Utilities.getUuid() + Date.now() + Math.random() + i));
-    let dn = bytesToBig_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, seed)) % (EC_N - 1n) + 1n;
+    let dn = bytesToBig_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, seed)) % (EC_N - B1_) + B1_;
     const Q = ecMul_(dn); d = dn.toString(16); pub = b64u_([4].concat(bigToBytes_(Q[0], 32), bigToBytes_(Q[1], 32)));
     pr.setProperties({ vapidD: d, vapidPub: pub });
   }
