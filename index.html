@@ -194,7 +194,7 @@ nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;st
 .ov-tile.warn .ov-ico{color:var(--wrn);background:color-mix(in srgb,var(--wrn) 14%,transparent)}
 .ov-tile.serious .ov-ico{color:var(--ser);background:color-mix(in srgb,var(--ser) 12%,transparent)}
 .ov-tile.z .ov-ico{color:var(--good);background:color-mix(in srgb,var(--good) 10%,transparent)}.ov-tile.z b{color:var(--mut)}
-.ov-row2{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px}.ov-row2>.ov-card{flex:1 1 300px;min-width:0}.kytbl input{min-width:132px}.kytbl td{vertical-align:top}#alerts{overflow-x:auto;max-width:100%}@media(max-width:700px){.box,.ov-card{overflow-x:auto;max-width:100%}section table{display:block;max-width:100%;overflow-x:auto}section select{max-width:100%}}.ov-row2>.ov-w{flex:1.7 1 520px}
+.ov-row2{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px}.ov-row2>.ov-card{flex:1 1 300px;min-width:0}.kytbl input{min-width:132px}.kyf{display:inline-flex;align-items:center;gap:4px;margin:4px 6px 0 0;padding:2px 6px;border:1px solid var(--bd);border-radius:6px;font-size:12px;max-width:100%}.kyf.new{border-style:dashed}.kyx{border:0;background:none;color:var(--bad);cursor:pointer;font-size:14px;padding:0 2px}.ky_att{margin-top:4px;padding:3px 8px;font-size:12px}.ky_sc{font-size:12px;max-width:300px;margin-top:2px}.kytbl td{vertical-align:top}#alerts{overflow-x:auto;max-width:100%}@media(max-width:700px){.box,.ov-card{overflow-x:auto;max-width:100%}section table{display:block;max-width:100%;overflow-x:auto}section select{max-width:100%}}.ov-row2>.ov-w{flex:1.7 1 520px}
 .ov-card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
 .ov-ch{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.ov-ch h3{margin:0;font-size:15px;font-weight:650}.ov-ch select{width:auto;padding:4px 8px;font-size:13px}
 .ov-l{font-size:12.5px;color:var(--mut)}.ov-big{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.15;margin:2px 0 4px}.ov-num{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.15;margin:2px 0 10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ov-num .b{font-size:12px;letter-spacing:0}
@@ -836,14 +836,15 @@ function fcnt(sid,cat){return FM.filter(function(f){return f.sid===sid&&(!cat||f
 function fget(id){return FM.filter(function(f){return f.id===id})[0]}
 function idb(){return FDB||(FDB=new Promise(function(res,rej){if(!window.indexedDB){rej(new Error('Trình duyệt không hỗ trợ lưu file'));return}var q=indexedDB.open('bts_files',1);q.onupgradeneeded=function(){q.result.createObjectStore('files',{keyPath:'id'})};q.onsuccess=function(){res(q.result)};q.onerror=function(){rej(q.error)}}))}
 function tx(mode,fn){return idb().then(function(d){return new Promise(function(res,rej){var t=d.transaction('files',mode),r=fn(t.objectStore('files'));t.oncomplete=function(){res(r&&r.result)};t.onerror=function(){rej(t.error)};t.onabort=function(){rej(t.error)}})})}
-function loadFiles(){return tx('readonly',function(s){return s.getAll()}).then(function(a){FM=a||[];render()}).catch(function(){})}
+function loadFiles(){return tx('readonly',function(s){return s.getAll()}).then(function(a){FM=a||[];fmDedupe();render()}).catch(function(){})}
 function isOffice(f){return /\.(xlsx|csv|docx|txt)$/i.test(f.name||'')}
 function isPdf(f){return f.type==='application/pdf'||/\.pdf$/i.test(f.name)}
 function addFiles(sid,cat,list,note,ext){ext=ext||{};if(!fileCan(cat,ext))return Promise.resolve('Chỉ tài khoản Admin được tải hồ sơ lên.');var big=[].filter.call(list||[],function(f){return f.size>20*1024*1024});var svg=[].filter.call(list||[],function(f){return /svg|html|javascript|^(text|application)\/xml$/i.test(f.type||'')||/\.(svg|html?|xml|js|exe|bat)$/i.test(f.name)});if(svg.length)return Promise.resolve('Không nhận loại file này (chỉ PDF, ảnh JPG/PNG/WEBP/HEIC, Office): '+svg.map(function(f){return f.name}).join(', '));if(big.length)return Promise.resolve('File quá lớn (tối đa 20 MB): '+big.map(function(f){return f.name}).join(', ')+'. Hãy nén hoặc tách file PDF.');
  var fs=[].slice.call(list||[]);if(!fs.length)return Promise.resolve('');var ok=fs.filter(function(f){return !/\.(exe|bat|cmd|com|msi|scr|ps1|vbs|js|jar|apk|sh|html?|svg|xml)$/i.test(f.name)}),bad=fs.length-ok.length;if(!ok.length)return Promise.resolve('Không nhận loại file này (file chạy được hoặc trang web).');
- var t=Date.now(),recs=ok.map(function(f,i){var o={id:nid(),sid:sid,cat:cat,name:f.name,size:f.size,date:iso(today()),note:note||'',blob:f};if(ext.tid)o.tid=ext.tid;if(ext.bid)o.bid=ext.bid;if(ext.eid)o.eid=ext.eid;return o});
+ var dupN=0;ok=ok.filter(function(f){var d=FM.some(function(z){return z.sid===sid&&z.cat===cat&&z.name===f.name&&z.size===f.size&&(z.kyk||'')===(ext.kyk||'')&&(z.eid||0)===(ext.eid||0)&&(z.tid||0)===(ext.tid||0)&&(z.bid||0)===(ext.bid||0)});if(d)dupN++;return !d});if(!ok.length)return Promise.resolve('File đã có trong hồ sơ, không lưu trùng.');
+ var t=Date.now(),recs=ok.map(function(f,i){var o={id:nid(),sid:sid,cat:cat,name:f.name,size:f.size,date:iso(today()),note:note||'',blob:f};if(ext.tid)o.tid=ext.tid;if(ext.bid)o.bid=ext.bid;if(ext.eid)o.eid=ext.eid;if(ext.kyk)o.kyk=ext.kyk;return o});
  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
- return tx('readwrite',function(s){recs.forEach(function(r){s.put(r)})}).then(function(){FM=FM.concat(recs);recs.forEach(function(r){audit(sid,'Đính kèm hồ sơ',fcn(cat)+': '+r.name+' ('+fsz(r.size)+')')});render();hsRead(recs.filter(function(r){return isOffice(r)||r.cat==='data'}));return 'Đã lưu '+recs.length+' file'+(bad?', bỏ qua '+bad+' file không đúng định dạng':'')+'.'})
+ return tx('readwrite',function(s){recs.forEach(function(r){s.put(r)})}).then(function(){FM=FM.concat(recs);recs.forEach(function(r){audit(sid,'Đính kèm hồ sơ',fcn(cat)+': '+r.name+' ('+fsz(r.size)+')')});render();hsRead(recs.filter(function(r){return isOffice(r)||r.cat==='data'}));return 'Đã lưu '+recs.length+' file'+(bad?', bỏ qua '+bad+' file không đúng định dạng':'')+(dupN?', bỏ qua '+dupN+' file đã có':'')+'.'})
   .catch(function(e){return 'Không lưu được file: '+(e&&e.name==='QuotaExceededError'?'bộ nhớ trình duyệt đã đầy.':(e&&e.message||e))})}
 function openFile(id){var f=fget(id);if(!f)return;if(!f.blob){var w=window.open('','_blank');ensureBlob(f).then(function(){var u2=URL.createObjectURL(new Blob([f.blob],{type:safeType(f)}));if(w)w.location.href=u2;else window.open(u2,'_blank')},function(e){if(w)w.close();alert('Không tải được file: '+(e.message||e))});return}var u=URL.createObjectURL(new Blob([f.blob],{type:safeType(f)}));window.open(u,'_blank');setTimeout(function(){URL.revokeObjectURL(u)},120000)}
 function dlFile(id){var f=fget(id);if(!f)return;if(!f.blob){ensureBlob(f).then(function(){dlFile(id)},function(e){alert('Không tải được file: '+(e.message||e))});return}var a=document.createElement('a');a.href=URL.createObjectURL(f.blob);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},0)}
@@ -878,7 +879,7 @@ function restoreFiles(arr,add){return tx('readwrite',function(s){if(!add)s.clear
 try{localStorage.removeItem('bts_cloud')}catch(e){}
 
 var FORMINV={},FORMVAL={};
-function fillInvAmt(){INV=INV.filter(function(v){return !(v.note==='Chuyển từ dữ liệu cũ, cần nhập giá trị'&&(v.amt===''||v.amt==null)&&!v.no)})}   /* bỏ hóa đơn treo không có giá trị chuyển từ dữ liệu rất cũ */
+function fillInvAmt(){invClrOld();INV=INV.filter(function(v){return !(v.note==='Chuyển từ dữ liệu cũ, cần nhập giá trị'&&(v.amt===''||v.amt==null)&&!v.no)})}   /* bỏ hóa đơn treo không có giá trị chuyển từ dữ liệu rất cũ */
 function invChanged(o,cr){var p=cr+'_';return [o[p+'invDate']||'',o[p+'paidDate']||'',String(o[p+'payAmt']==null?'':o[p+'payAmt']),o[p+'invNo']||'',o[p+'invCode']||''].join('|')!==FORMVAL[cr]}
 function syncInv(o){CR.forEach(function(c,i){var p=c[0]+'_',d=o[p+'invDate'],a=String(o[p+'payAmt']||''),pd=o[p+'paidDate']||'',ky=o[p+'ky']||'';if(!d||!invChanged(o,c[0]))return;
  var m=INV.filter(function(v){return v.id===FORMINV[c[0]]})[0];
@@ -1291,7 +1292,7 @@ function openInv(id,sid,cr){if(!can('nm'))return;INVF={};if(!S.length){show('<p>
  var v=INV.filter(function(z){return z.id===id})[0]||{sid:sid||(site(GS)?GS:S[0].id),cr:cr||'mb',date:iso(today())};
  show('<h2 style="margin-top:0">'+(id?'Sửa hóa đơn':'Thêm hóa đơn')+'</h2><div class="grid">'
  +inp('i_sid','Trạm','select',String(v.sid),S.map(function(x){return [String(x.id),x.code+' '+(x.name||'')]}))+inp('i_cr','Nhà mạng','select',v.cr,CR)
- +'<div class="geo invs"><div class="geob"><input type="file" id="isf_i" accept=".pdf,application/pdf" hidden onchange="invScanDlg(this.files[0])"><button type="button" class="btn p" onclick="$(\'#isf_i\').click()">📄 Quét PDF hóa đơn</button></div><div class="m" id="ism_i">Tự điền giá trị sau VAT, ngày lập, số và mã hóa đơn.</div></div>'+inp('i_ky','Kỳ (vd: Quý 3/2026)','text',v.ky)+inp('i_no','Số hóa đơn','text',v.no)+inp('i_code','Mã hóa đơn (mã CQT / tra cứu)','text',v.code)+inp('i_date','Ngày xuất hóa đơn','date',v.date)+inp('i_amt','Giá trị hóa đơn sau VAT (đ)','number',v.amt)
+ +'<div class="geo invs"><div class="geob"><input type="file" id="isf_i" accept=".pdf,application/pdf,image/*" hidden onchange="invScanDlg(this.files[0])"><button type="button" class="btn p" onclick="$(\'#isf_i\').click()">📄 Quét PDF hóa đơn</button></div><div class="m" id="ism_i">Tự điền giá trị sau VAT, ngày lập, số và mã hóa đơn.</div></div>'+inp('i_ky','Kỳ (vd: Quý 3/2026)','text',v.ky)+inp('i_no','Số hóa đơn','text',v.no)+inp('i_code','Mã hóa đơn (mã CQT / tra cứu)','text',v.code)+inp('i_date','Ngày xuất hóa đơn','date',v.date)+inp('i_amt','Giá trị hóa đơn sau VAT (đ)','number',v.amt)
  +'<div class="sec">Nhận tiền</div>'+inp('i_pdate','Ngày nhận tiền (để trống nếu chưa nhận)','date',v.pdate)+inp('i_pamt','Số tiền đã nhận (đ, trống = bằng giá trị hóa đơn)','number',v.pamt)
  +'</div><div style="margin-top:10px">'+inp('i_note','Ghi chú','text',v.note)+'</div><div class="m" id="err" style="color:var(--bad);margin-top:8px"></div><div class="act"><button class="btn" onclick="close_()">Hủy</button><button class="btn p" onclick="saveInv('+(id||0)+')">Lưu hóa đơn</button></div>');
  if(!id){var e=$('#i_amt');e.oninput=function(){e.dataset.auto='0'};$('#i_sid').onchange=$('#i_cr').onchange=invAuto;invAuto()}}
@@ -1327,7 +1328,7 @@ var SYNC={cfg:ld('bts_sync'),ver:Number((function(){try{return localStorage.getI
 function syncOn(){return !!(SYNC.cfg&&SYNC.cfg.url&&SYNC.cfg.token)}
 function syncLS(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v));return true}catch(e){return false}}
 function saveUp(){syncLS('bts_sync_up',Object.keys(SYNC.up))}
-function metaOf(f){return JSON.parse(JSON.stringify({id:f.id,sid:f.sid,cat:f.cat,name:f.name,size:f.size,date:f.date,note:f.note||'',tid:f.tid,bid:f.bid,eid:f.eid,ex:f.ex||undefined,type:f.type||(f.blob&&f.blob.type)||''}))}
+function metaOf(f){return JSON.parse(JSON.stringify({id:f.id,sid:f.sid,cat:f.cat,name:f.name,size:f.size,date:f.date,note:f.note||'',tid:f.tid,bid:f.bid,eid:f.eid,kyk:f.kyk,ex:f.ex||undefined,type:f.type||(f.blob&&f.blob.type)||''}))}
 function emptyData(){return {sites:[],logs:[],audit:[],inv:[],elec:[],eq:[],jobs:[],bm:[],acl:null,pw:{},ses:{},files:[]}}
 function snapData(){return JSON.parse(JSON.stringify({sites:S,logs:L,audit:A,inv:INV,elec:EL,eq:EQ,jobs:JB,bm:BM,acl:ACL,pw:ld('bts_pw')||{},ses:ld('bts_ses')||{},files:FM.map(metaOf)},noTmp))}
 function markDirty(){if(!syncOn()||SYNC.apply||(SYNC.joinedByLink&&SYNC.ver===0))return;SYNC.dirty=true;SYNC.gen++;syncLS('bts_sync_dirty','1');clearTimeout(SYNC.timer);SYNC.timer=setTimeout(syncNow,1500);syncBadge()}
@@ -1360,8 +1361,8 @@ function applyData(d,join){d=d||emptyData();var nb=myNewJobs().map(function(j){r
 function reconcileFiles(meta){var ids={};meta.forEach(function(m){ids[String(m.id)]=1});
  FM.filter(function(f){return !ids[String(f.id)]&&SYNC.up[String(f.id)]}).forEach(function(f){tx('readwrite',function(s){s.delete(f.id)}).catch(function(){})});
  FM=FM.filter(function(f){return ids[String(f.id)]||!SYNC.up[String(f.id)]});
- meta.forEach(function(m){var f=fget(m.id);if(f){['sid','cat','name','size','date','note','tid','bid','eid','ex'].forEach(function(k){if(m[k]!==undefined)f[k]=m[k]})}else FM.push(Object.assign({},m,{blob:null,rem:1}))});
- setTimeout(dlRemote,200)}
+ meta.forEach(function(m){var f=fget(m.id);if(f){['sid','cat','name','size','date','note','tid','bid','eid','kyk','ex'].forEach(function(k){if(m[k]!==undefined)f[k]=m[k]})}else FM.push(Object.assign({},m,{blob:null,rem:1}))});
+ fmDedupe();setTimeout(dlRemote,200)}
 function ensureBlob(f){if(f.blob)return Promise.resolve(f);if(!syncOn())return Promise.reject(new Error('Chưa kết nối đồng bộ online'));if(f._p)return f._p;
  f._p=sget('action=file&id='+encodeURIComponent(f.id)).then(function(j){var bin=atob(j.b64||''),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);f.blob=new Blob([u],{type:j.type||f.type||''});delete f.rem;var rec={};Object.keys(f).forEach(function(k){if(k!=='rem'&&k!=='_p')rec[k]=f[k]});return tx('readwrite',function(s){s.put(rec)})})
   .then(function(){SYNC.up[String(f.id)]=1;saveUp();delete f._p;return f},function(e){delete f._p;throw e});return f._p}
@@ -1535,11 +1536,11 @@ function kyStat(sid,cr,ks){var o={n:ks.length,tot:0,inv:0,paid:0,due:0};if(cr===
 function kyRow(cr,k,v,sid){var st='';if(cr==='cdt'){v={no:k.no,date:k.date,pdate:k.pdate};st=k.pdate?'<span class="b ok">Đã thanh toán</span>':k.from&&k.from<=iso(today())?'<span class="b '+(-days(k.from)>=30?'bad':'warn')+'">Chưa thanh toán (đến hạn '+(-days(k.from))+' ngày)</span>':'<span class="m">Chưa đến kỳ</span>'}else if(v){var a=Number(v.amt)||0,pa=pamtOf(v);st=v.pdate&&a-pa<=0.5?'<span class="b ok">Đã thu</span>':v.pdate?'<span class="b warn">Thu thiếu '+money(a-pa)+'</span>':'<span class="b '+(-days(v.date)>=60?'bad':'warn')+'">Chưa thu ('+(-days(v.date))+' ngày)</span>'}else if(cr!=='cdt')st='<span class="m">Chưa xuất HĐ</span>';
  var d=function(c,val,ph){return '<input type="date" class="'+c+'" value="'+esc(val||'')+'" title="'+ph+'">'},t=function(c,val,ph,ty){return '<input type="'+(ty||'text')+'" class="'+c+'" value="'+esc(val==null?'':val)+'" placeholder="'+ph+'">'};
  var ntc='';if(0)ntc='<td>'+d('ky_nt',k.nt,'Ngày ký biên bản nghiệm thu')+'<div class="ky_st">'+(k.nt?'<span class="b ok">Đã nghiệm thu</span>':k.from&&k.from<=iso(today())?'<span class="b '+(-days(k.from)>=30?'bad':'warn')+'">Chưa nghiệm thu ('+(-days(k.from))+' ngày)</span>':'<span class="m">Chưa đến kỳ</span>')+'</div></td>';
- return '<tr class="ky_r" data-cr="'+cr+'"><td style="white-space:nowrap"><b>Kỳ <span class="ky_n">'+k.n+'</span></b></td><td>'+d('ky_f',k.from,'Từ ngày')+d('ky_t',k.to,'Đến ngày')+'</td><td>'+t('ky_a',k.amt,'Số tiền (đ)','number')+'</td>'+ntc+'<td>'+t('ky_no',v?v.no:'',cr==='cdt'?'Số HĐ / chứng từ CĐT':'Số hóa đơn')+d('ky_d',v?v.date:'',cr==='cdt'?'Ngày CĐT xuất HĐ':'Ngày xuất HĐ')+'</td><td>'+d('ky_p',v?v.pdate:'',cr==='cdt'?'Ngày Á Châu thanh toán':'Ngày nhận tiền')+'<div class="ky_st">'+st+'</div></td><td><button type="button" class="btn d" onclick="kyDel(this,\''+cr+'\')">Xóa</button></td></tr>'}
+ return '<tr class="ky_r" data-cr="'+cr+'" data-sid="'+(sid||0)+'" data-k0="'+esc(k.from||'')+'"><td style="white-space:nowrap"><b>Kỳ <span class="ky_n">'+k.n+'</span></b></td><td>'+d('ky_f',k.from,'Từ ngày')+d('ky_t',k.to,'Đến ngày')+'</td><td>'+t('ky_a',k.amt,'Số tiền (đ)','number')+'</td>'+ntc+'<td>'+t('ky_no',v?v.no:'',cr==='cdt'?'Số HĐ / chứng từ CĐT':'Số hóa đơn')+d('ky_d',v?v.date:'',cr==='cdt'?'Ngày CĐT xuất HĐ':'Ngày xuất HĐ')+'<div class="ky_fl">'+kyFlStr(sid,cr,k.from||'',[])+'</div><button type="button" class="btn ky_att" onclick="kyAtt(this)" title="Đính kèm hóa đơn (PDF / ảnh chụp / Word, Excel); PDF và ảnh được quét để tự điền số, ngày, số tiền">📎 Đính kèm / quét HĐ</button><div class="ky_sc m"></div></td><td>'+d('ky_p',v?v.pdate:'',cr==='cdt'?'Ngày Á Châu thanh toán':'Ngày nhận tiền')+'<div class="ky_st">'+st+'</div></td><td><button type="button" class="btn d" onclick="kyDel(this,\''+cr+'\')">Xóa</button></td></tr>'}
 function kyBox(id,cr,x,grp){var ks=(x&&x[cr+'_kys'])||[];if(!Array.isArray(ks))ks=[];var E=cr==='cdt';
- return '<div class="kybox'+(grp?' g-'+grp:'')+'" id="kyb_'+cr+'" style="grid-column:1/-1;border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin:4px 0"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>'+(E?'Các kỳ Á Châu thanh toán cho CĐT':'Các kỳ thanh toán – '+crn(cr))+'</b> '+yrSel('kyt_'+cr)+'<span style="margin-left:auto"><button type="button" class="btn" onclick="kyAdd(\''+cr+'\')">+ Thêm kỳ</button> <button type="button" class="btn d" onclick="kyClr(this,\''+cr+'\')" title="Xóa số tiền, hóa đơn, ngày thanh toán của các kỳ đang hiển thị">🧹 Xóa trắng giá trị</button>'+(id?' <button type="button" class="btn p" onclick="kyFromDocs(\''+cr+'\','+id+')">📎 Tạo lịch kỳ từ HĐ đính kèm</button>':'')+'</span></div>'
+ return '<div class="kybox'+(grp?' g-'+grp:'')+'" id="kyb_'+cr+'" style="grid-column:1/-1;border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin:4px 0"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>'+(E?'Các kỳ Á Châu thanh toán cho CĐT':'Các kỳ thanh toán – '+crn(cr))+'</b> '+yrSel('kyt_'+cr)+'<span style="margin-left:auto"><button type="button" class="btn" onclick="kyAdd(\''+cr+'\')">+ Thêm kỳ</button> <button type="button" class="btn d" onclick="kyClr(this,\''+cr+'\')" title="Xóa số tiền, hóa đơn, ngày thanh toán của các kỳ đang hiển thị">🧹 Xóa trắng giá trị</button> <button type="button" class="btn" onclick="kyBulk(\''+cr+'\')" title="Chọn nhiều file hóa đơn PDF / ảnh: tự quét và xếp vào đúng kỳ">🧾 Quét nhiều hóa đơn</button>'+(id?' <button type="button" class="btn p" onclick="kyFromDocs(\''+cr+'\','+id+')">📎 Tạo lịch kỳ từ HĐ đính kèm</button>':'')+'</span></div>'
   +'<p class="m" style="margin:4px 0">'+(E?'Mỗi kỳ: thời gian và số tiền Á Châu phải trả theo HĐ; số HĐ / chứng từ CĐT gửi (nếu có) và <b>ngày Á Châu đã thanh toán</b>. "Kỳ thanh toán kế tiếp" tự lấy ngày bắt đầu của kỳ chưa thanh toán đầu tiên; chi phí thuê trong Phân tích AI tính theo các kỳ này.':'Mỗi kỳ: thời gian và số tiền theo HĐ; số hóa đơn + ngày xuất khi xuất hóa đơn kỳ đó, ngày nhận tiền khi đã thu. Bấm <b>Lưu trạm</b> để ghi (hóa đơn từng kỳ hiện ở tab HĐ nhà mạng, tính vào công nợ, doanh thu).')+'</p>'
-  +'<div class="box" style="overflow-x:auto"><table class="kytbl" style="min-width:'+(E?820:980)+'px"><thead><tr><th>Kỳ</th><th>Thời gian (từ – đến)</th><th>'+(E?'Số tiền phải trả':'Số tiền theo HĐ')+'</th><th>'+(E?'HĐ / chứng từ CĐT':'Hóa đơn (số, ngày xuất)')+'</th><th>'+(E?'Đã thanh toán':'Nhận tiền')+'</th><th></th></tr></thead><tbody id="kyt_'+cr+'">'+ks.map(function(k){return kyRow(cr,k,E?k:(id?kyInv(id,cr,k.n,k):null),id)}).join('')+'</tbody></table></div><div class="m" id="yrs_kyt_'+cr+'" style="margin-top:6px"></div><div class="m" id="kys_'+cr+'" style="margin-top:6px"></div><div class="m" id="kym_'+cr+'"></div></div>'}
+  +'<div class="box" style="overflow-x:auto"><table class="kytbl" style="min-width:'+(E?900:1040)+'px"><thead><tr><th>Kỳ</th><th>Thời gian (từ – đến)</th><th>'+(E?'Số tiền phải trả':'Số tiền theo HĐ')+'</th><th>'+(E?'HĐ / chứng từ CĐT':'Hóa đơn (số, ngày xuất)')+'</th><th>'+(E?'Đã thanh toán':'Nhận tiền')+'</th><th></th></tr></thead><tbody id="kyt_'+cr+'">'+ks.map(function(k){return kyRow(cr,k,E?k:(id?kyInv(id,cr,k.n,k):null),id)}).join('')+'</tbody></table></div><div class="m" id="yrs_kyt_'+cr+'" style="margin-top:6px"></div><div class="m" id="kys_'+cr+'" style="margin-top:6px"></div><div class="m" id="kym_'+cr+'"></div></div>'}
 function kyEnh(root){if(typeof dEnh==='function')[].forEach.call((root||document).querySelectorAll('.kybox input[type=date]'),function(e){try{dEnh(e)}catch(x){}})}
 function kyRenum(cr){[].forEach.call(document.querySelectorAll('#kyt_'+cr+' .ky_n'),function(e,i){e.textContent=i+1});kySum(cr)}
 function kySum(cr){var e=$('#kys_'+cr);if(!e)return;var rs=document.querySelectorAll('#kyt_'+cr+' tr'),tot=0,ni=0,np=0;[].forEach.call(rs,function(r){tot+=Number(r.querySelector('.ky_a').value)||0;if(r.querySelector('.ky_d').value)ni++;if(r.querySelector('.ky_p').value)np++});
@@ -1554,19 +1555,21 @@ function kyFromDocs(cr,sid){var fs=FM.filter(function(f){return f.sid===sid&&f.c
  (function nx(){if(i>=fs.length)return done();var f=fs[i++];m.innerHTML='<span class="spin"></span> Đang đọc lịch kỳ trong '+esc(f.name)+'…';ensureBlob(f).then(function(f2){return hdRead(new File([f2.blob],f.name,{type:'application/pdf'}),false)}).then(function(R){if(R.kys&&R.kys.length)docs.push({sign:R.sign||'',name:f.name,kys:R.kys})},function(){}).then(nx)})();
  function done(){if(!docs.length){m.textContent='Không thấy lịch các kỳ ("Kỳ 1: Từ ngày … → …, số tiền …") trong file đính kèm.';return}docs.sort(function(a,b){return a.sign<b.sign?-1:a.sign>b.sign?1:0});var P=[];
   docs.forEach(function(dc){dc.kys.forEach(function(k){P=P.filter(function(q){return !(q.from<=k.to&&k.from<=q.to)});P.push({from:k.from,to:k.to,amt:k.amt,src:dc.name})})});P.sort(function(a,b){return a.from<b.from?-1:1});
-  var tb=$('#kyt_'+cr),keep={};[].forEach.call(tb.querySelectorAll('tr'),function(r){var f0=r.querySelector('.ky_f').value;if(f0)keep[f0]={no:r.querySelector('.ky_no').value,date:r.querySelector('.ky_d').value,pdate:r.querySelector('.ky_p').value,nt:(r.querySelector('.ky_nt')||{}).value||''}});
-  tb.innerHTML=P.map(function(k,ix){var kk={n:ix+1,from:k.from,to:k.to,amt:k.amt},v=keep[k.from]||(cr==='cdt'?null:kyInv(sid,cr,ix+1,kk))||null;if(cr==='cdt'&&v){kk.no=v.no;kk.date=v.date;kk.pdate=v.pdate}if(keep[k.from]&&keep[k.from].nt)kk.nt=keep[k.from].nt;return kyRow(cr,kk,v)}).join('');kyEnh(tb);kyRenum(cr);yrInit('kyt_'+cr);
+  var tb=$('#kyt_'+cr),keep={};[].forEach.call(tb.querySelectorAll('tr'),function(r){var f0=r.querySelector('.ky_f').value;if(f0)keep[f0]={kf:r._kf,no:r.querySelector('.ky_no').value,date:r.querySelector('.ky_d').value,pdate:r.querySelector('.ky_p').value,nt:(r.querySelector('.ky_nt')||{}).value||''}});
+  tb.innerHTML=P.map(function(k,ix){var kk={n:ix+1,from:k.from,to:k.to,amt:k.amt},v=keep[k.from]||(cr==='cdt'?null:kyInv(sid,cr,ix+1,kk))||null;if(cr==='cdt'&&v){kk.no=v.no;kk.date=v.date;kk.pdate=v.pdate}if(keep[k.from]&&keep[k.from].nt)kk.nt=keep[k.from].nt;return kyRow(cr,kk,v,sid)}).join('');[].forEach.call(tb.querySelectorAll('tr'),function(r){var q=keep[r.querySelector('.ky_f').value];if(q&&q.kf&&q.kf.length){r._kf=q.kf;kyFRef(r)}});kyEnh(tb);kyRenum(cr);yrInit('kyt_'+cr);
   m.innerHTML='✓ Đã tạo '+P.length+' kỳ từ '+docs.map(function(d){return esc(d.name)}).join(', ')+'. Kiểm tra rồi bấm <b>Lưu trạm</b>.'}}
-function kyCollect(o){KYPEND={};KYCLR={};var err='';CR.concat([['cdt','HĐ CĐT']]).forEach(function(c){var cr=c[0],tb=$('#kyt_'+cr);if(!tb||err)return;var arr=[],inv=[];
+function kyCollect(o){KYPEND={};KYCLR={};KYFILES=[];KYREKEY=[];var err='';CR.concat([['cdt','HĐ CĐT']]).forEach(function(c){var cr=c[0],tb=$('#kyt_'+cr);if(!tb||err)return;var arr=[],inv=[];
   [].forEach.call(tb.querySelectorAll('tr'),function(r,ix){if(err)return;var g=function(s){var e=r.querySelector(s);return e?e.value.trim():''},nt=g('.ky_nt'),k={n:ix+1,from:g('.ky_f'),to:g('.ky_t'),amt:g('.ky_a')},no=g('.ky_no'),d=g('.ky_d'),p=g('.ky_p'),lab=c[1]+' kỳ '+k.n+': ';
-   if(!k.from&&!k.to&&!k.amt&&!no&&!d&&!p&&!nt)return;if(nt&&nt>iso(today())){err=lab+'ngày ký nghiệm thu không được sau hôm nay.';return}if(nt)k.nt=nt;if(k.from&&k.to&&k.to<k.from){err=lab+'ngày kết thúc phải sau ngày bắt đầu.';return}if(cr==='cdt'){if((d&&d>iso(today()))||(p&&p>iso(today()))){err=lab+'ngày không được sau hôm nay.';return}if(p&&!(Number(k.amt)>0)){err=lab+'nhập số tiền của kỳ.';return}k.no=no;k.date=d;k.pdate=p;Object.keys(k).forEach(function(z){if(k[z]==='')delete k[z]});arr.push(k);return}
+   var kf=r._kf||[],k0=r.dataset.k0||'';if(!k.from&&!k.to&&!k.amt&&!no&&!d&&!p&&!nt&&!kf.length)return;if(kf.length&&!k.from){err=lab+'nhập thời gian kỳ (từ ngày) trước khi đính kèm hóa đơn.';return}
+   if(kf.length)KYFILES.push({cr:cr,key:kyKey(cr,k.from),files:kf,lab:kyLabel(k)+(no?' · HĐ số '+no:'')});if(k0&&k.from&&k0!==k.from)KYREKEY.push({o:kyKey(cr,k0),n:kyKey(cr,k.from)});if(nt&&nt>iso(today())){err=lab+'ngày ký nghiệm thu không được sau hôm nay.';return}if(nt)k.nt=nt;if(k.from&&k.to&&k.to<k.from){err=lab+'ngày kết thúc phải sau ngày bắt đầu.';return}if(cr==='cdt'){if((d&&d>iso(today()))||(p&&p>iso(today()))){err=lab+'ngày không được sau hôm nay.';return}if(p&&!(Number(k.amt)>0)){err=lab+'nhập số tiền của kỳ.';return}k.no=no;k.date=d;k.pdate=p;Object.keys(k).forEach(function(z){if(k[z]==='')delete k[z]});arr.push(k);return}
    if(p&&!d){err=lab+'nhập ngày xuất hóa đơn trước ngày nhận tiền.';return}if(d&&p&&p<d){err=lab+'ngày nhận tiền không được trước ngày xuất hóa đơn.';return}
    if((d&&d>iso(today()))||(p&&p>iso(today()))){err=lab+'ngày xuất hóa đơn / nhận tiền không được sau hôm nay.';return}if(d&&!(Number(k.amt)>0)){err=lab+'nhập số tiền của kỳ trước khi ghi hóa đơn.';return}
    Object.keys(k).forEach(function(z){if(k[z]==='')delete k[z]});arr.push(k);if(d)inv.push({k:k,no:no,date:d,pdate:p});else (KYCLR[cr]=KYCLR[cr]||{rows:[]}).rows.push(k)});
   if(err)return;if(arr.length)o[cr+'_kys']=arr;else delete o[cr+'_kys'];if(cr==='cdt'){if(arr.length){var nx=arr.filter(function(k){return !k.pdate&&k.from})[0];o.cdtPayNext=nx?nx.from:''}return}
   KYPEND[cr]=inv;KYCLR[cr]=KYCLR[cr]||{rows:[]};KYCLR[cr].all=arr});return err}
 var KYCLR={};
-function kyApply(o){var n=0;Object.keys(KYCLR).forEach(function(cr){var C=KYCLR[cr],del={},keep={};(C.all||[]).forEach(function(k){var v=kyInv(o.id,cr,k.n,k);if(v)keep[v.id]=1});
+function kyApply(o){var n=0;KYREKEY.forEach(function(q){FM.forEach(function(f){if(f.sid===o.id&&f.kyk===q.o){f.kyk=q.n;tx('readwrite',function(s2){s2.put(f)}).catch(function(){})}})});KYREKEY=[];
+ var kfs=KYFILES;KYFILES=[];kfs.forEach(function(q){addFiles(o.id,q.cr,q.files,'Hóa đơn '+q.lab,{kyk:q.key}).then(function(m){if(/Không|quá lớn|đầy/.test(m||''))toast(m)})});Object.keys(KYCLR).forEach(function(cr){var C=KYCLR[cr],del={},keep={};(C.all||[]).forEach(function(k){var v=kyInv(o.id,cr,k.n,k);if(v)keep[v.id]=1});
   C.rows.forEach(function(k){var v=kyInv(o.id,cr,k.n,k);if(v){del[v.id]=1;delete keep[v.id]}});   /* kỳ bị xóa trắng hóa đơn */
   INV.forEach(function(v){if(v.sid===o.id&&v.cr===cr&&v.kyNo!=null&&!keep[v.id])del[v.id]=1});   /* kỳ đã bị xóa khỏi bảng */
   (KYPEND[cr]||[]).forEach(function(e){var v=kyInv(o.id,cr,e.k.n,e.k);if(v)delete del[v.id]});
@@ -1662,6 +1665,66 @@ function kyClr(b,cr){if(!b.dataset.s){b.dataset.s=1;b.textContent='Bấm lại �
  [].forEach.call(document.querySelectorAll('#kyt_'+cr+' tr'),function(r){if(r.style.display==='none')return;['.ky_a','.ky_no','.ky_d','.ky_p'].forEach(function(c){var e=r.querySelector(c);if(e&&e.value){e.value='';e.dispatchEvent(new Event('change',{bubbles:true}));n++}});var st=r.querySelector('.ky_st');if(st)st.innerHTML='<span class="m">Sẽ xóa khi Lưu trạm</span>'});
  b.dataset.s='';b.textContent='🧹 Xóa trắng giá trị';kySum(cr);yrApply('kyt_'+cr);var m=$('#kym_'+cr);if(m)m.innerHTML=n?'Đã xóa trắng số tiền / hóa đơn / ngày thanh toán của các kỳ đang hiển thị. Bấm <b>Lưu trạm</b> để ghi (hóa đơn đã ghi của các kỳ này sẽ bị xóa).':'Không có giá trị nào để xóa.'}
 function kyNow(x,cr){var ks=x&&x[cr+'_kys'];if(!Array.isArray(ks)||!ks.length)return null;var t=iso(today()),c=ks.filter(function(k){return k.from&&k.from<=t&&(!k.to||t<=k.to)})[0];if(c)return c;var past=ks.filter(function(k){return k.from&&k.from<=t});return past[past.length-1]||ks[0]}
+/* ===== Hóa đơn đính kèm từng kỳ (PDF / ảnh chụp / Office): quét PDF hoặc ảnh để tự điền số, ngày, số tiền; quét nhiều hóa đơn và tự xếp vào đúng kỳ ===== */
+var KYFILES=[],KYREKEY=[],KYIMG=/\.(jpe?g|png|webp|gif|bmp)$/i;
+function isImg(f){return /^image\/(jpeg|png|webp|gif|bmp)$/.test(f.type||'')||KYIMG.test(f.name||'')}
+function kyKey(cr,from){return cr+'|'+from}
+function kyFilesOf(sid,cr,from){return sid&&from?FM.filter(function(f){return f.sid===sid&&f.kyk===kyKey(cr,from)}):[]}
+function kyFlHtml(tr){return kyFlStr(+tr.dataset.sid||0,tr.dataset.cr,tr.dataset.k0||'',tr._kf||[])}
+function kyFlStr(sid,cr,from,pend){var ex=kyFilesOf(sid,cr,from);
+ return ex.map(function(f){return '<span class="kyf">📎 <a href="#" onclick="openFile('+f.id+');return false" title="'+esc(f.name)+'">'+esc(f.name.length>22?f.name.slice(0,20)+'…':f.name)+'</a><button type="button" class="kyx" title="Xóa file" onclick="kyFDel(this,'+f.id+')">×</button></span>'}).join('')
+  +pend.map(function(f,i){return '<span class="kyf new" title="Lưu khi bấm Lưu trạm">🆕 '+esc(f.name.length>22?f.name.slice(0,20)+'…':f.name)+'<button type="button" class="kyx" onclick="kyFUn(this,'+i+')">×</button></span>'}).join('')}
+function kyFRef(tr){var e=tr.querySelector('.ky_fl');if(e)e.innerHTML=kyFlHtml(tr)}
+function kyFDel(b,id){if(!b.dataset.s){b.dataset.s=1;b.textContent='Xóa?';setTimeout(function(){b.dataset.s='';b.textContent='×'},3000);return}var tr=b.closest('tr');delFile(id);setTimeout(function(){kyFRef(tr)},300)}
+function kyFUn(b,i){var tr=b.closest('tr');(tr._kf||[]).splice(i,1);kyFRef(tr)}
+function kyBad(f){if(f.size>20*1048576)return 'quá 20 MB';if(/\.(exe|bat|cmd|com|msi|scr|ps1|vbs|js|jar|apk|sh|html?|svg|xml)$/i.test(f.name))return 'loại file không được phép';if(!f.size)return 'file rỗng';return ''}
+function kyAtt(b){var tr=b.closest('tr'),i=document.createElement('input');i.type='file';i.multiple=true;i.accept='.pdf,application/pdf,image/*,.heic,.doc,.docx,.xls,.xlsx';i.onchange=function(){kyAddF(tr,[].slice.call(i.files))};i.click()}
+function kyMsg(tr,h,c){var e=tr.querySelector('.ky_sc');if(e){e.innerHTML=h;e.style.color=c||''}}
+function kyAddF(tr,list){var bad=[],scan=null;list.forEach(function(f){var w=kyBad(f);if(w){bad.push(f.name+' ('+w+')');return}tr._kf=(tr._kf||[]).concat([f]);if(!scan&&(isPdf(f)||isImg(f)))scan=f});kyFRef(tr);
+ if(bad.length)kyMsg(tr,'Bỏ qua: '+esc(bad.join(', ')),'var(--bad)');if(scan)kyScan(tr,scan);else if(!bad.length)kyMsg(tr,'Đã thêm file (không quét được loại file này – nhập tay số, ngày hóa đơn).')}
+function invReadAny(f,st,done,key){if(isImg(f)){st('<span class="spin"></span> Đang nhận dạng chữ trong ảnh '+esc(f.name)+' (lần đầu mất 10–30 giây)…');
+  imgText(f,function(t){st('<span class="spin"></span> '+esc(t))}).then(function(r){var R=invParse(r.text);R.ocr=true;R.img=true;key=key||'x';AITOK[key]=f;if(aiOn())R.aiSt='run';done(R);
+   if(R.aiSt)aiRead('inv',f).then(function(A){if(AITOK[key]===f)done(aiInv(R,A))},function(e){if(AITOK[key]!==f)return;R.aiSt='err';R.aiErr=e&&e.message||String(e);done(R)})},function(e){st('Không đọc được ảnh: '+esc(e&&e.message||e),1)});return}
+ invRead(f,st,done,key)}
+function imgText(file,prog){prog('Đang tải bộ nhận dạng chữ…');return loadLib(TESS_URL).then(function(){return Tesseract.createWorker('vie')}).then(function(w){prog('Đang nhận dạng chữ trong ảnh…');return w.recognize(file).then(function(r){return w.terminate().then(function(){return {text:r.data.text,ocr:true}})})})}
+/* thời gian kỳ ghi trên hóa đơn: "từ 01/01/2026 đến 30/06/2026", "01/01/2026 - 30/06/2026", "Quý 3/2026", "6 tháng đầu năm 2026", "tháng 05/2026" */
+function kyPer(T){var F=vfold(String(T||'')),m,d='(\\d{1,2})[\\/.-](\\d{1,2})[\\/.-](\\d{4})';
+ m=new RegExp('(?:tu(?: ngay)?\\s*)?'+d+'\\s*(?:den(?: ngay)?|->|→|–|-|~)\\s*(?:ngay\\s*)?'+d).exec(F);if(m){var a=sdIso(m[1],m[2],m[3]),b=sdIso(m[4],m[5],m[6]);if(a&&b&&b>a)return {from:a,to:b}}
+ m=/quy\s*(i{1,3}|iv|[1-4])\s*(?:\/|-|nam)\s*(\d{4})/.exec(F);if(m){var q={i:1,ii:2,iii:3,iv:4}[m[1]]||+m[1],y=+m[2];return {from:y+'-'+String(q*3-2).padStart(2,'0')+'-01',to:iso(new Date(y,q*3,0))}}
+ m=/6 thang (dau|cuoi) nam\s*(\d{4})/.exec(F);if(m)return m[1]==='dau'?{from:m[2]+'-01-01',to:m[2]+'-06-30'}:{from:m[2]+'-07-01',to:m[2]+'-12-31'};
+ m=/thang\s*(\d{1,2})\s*(?:\/|-|nam)\s*(\d{4})/.exec(F);if(m&&+m[1]>=1&&+m[1]<=12){var y2=+m[2],mo=+m[1];return {from:y2+'-'+String(mo).padStart(2,'0')+'-01',to:iso(new Date(y2,mo,0))}}
+ return null}
+function kyFill(tr,R,f,bulk){var cr=tr.dataset.cr,E=cr==='cdt',g=function(c){return tr.querySelector(c)},set=function(c,v){var e=g(c);if(e&&v){e.value=v;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}))}},W=[],got=[];
+ var old=g('.ky_no').value;if(bulk&&old&&R.no&&old!==R.no){kyMsg(tr,'⚠ '+esc(f.name)+' (số '+esc(R.no)+'): kỳ này đã có hóa đơn số '+esc(old)+' – không ghi đè, chỉ đính kèm file. Kiểm tra lại.','var(--warn)');return false}
+ if(R.no){set('.ky_no',R.no);got.push('số '+R.no)}if(R.date){set('.ky_d',R.date);got.push('ngày '+fmt(R.date))}
+ var a=g('.ky_a'),cur=Number(a.value)||0,tot=Number(R.total)||0,pre=Number(R.pre)||0;
+ if(tot){got.push(money(tot));if(!cur)set('.ky_a',String(tot));else if(Math.abs(cur-tot)>1&&Math.abs(cur-pre)>1)W.push('Số tiền hóa đơn '+money(tot)+(pre?' (trước VAT '+money(pre)+')':'')+' khác số tiền kỳ '+money(cur)+' <button type="button" class="btn" style="padding:2px 8px" onclick="kyUseAmt(this,'+tot+')">Dùng số tiền hóa đơn</button>')}
+ if(!E&&R.carrier&&R.carrier!==cr)W.push('Người mua trên hóa đơn là '+crn(R.carrier)+', không phải '+crn(cr));
+ var P=R.per,kf=g('.ky_f').value,kt=g('.ky_t').value;if(P&&kf&&kt&&!(P.from<=kt&&kf<=P.to))W.push('Hóa đơn ghi thời gian '+fmt(P.from)+' – '+fmt(P.to)+', không thuộc kỳ này');
+ if(R.date&&R.date>iso(today()))W.push('Ngày hóa đơn sau hôm nay – kiểm tra lại');
+ kyMsg(tr,(got.length?'✓ '+esc(f.name)+(R.ocr?' (nhận dạng chữ – soát kỹ)':'')+': '+got.join(' · '):'Không tìm thấy số / ngày / số tiền trong '+esc(f.name)+' – nhập tay.')+(R.aiSt==='run'?' <span class="spin"></span> AI đang đọc…':R.ai?' <span class="b ok">AI đã kiểm tra</span>':'')+(W.length?'<br><span style="color:var(--warn)">⚠ '+W.join('<br>⚠ ')+'</span>':''),got.length?'':'var(--warn)');return true}
+function kyUseAmt(b,v){var tr=b.closest('tr'),a=tr.querySelector('.ky_a');a.value=String(v);a.dispatchEvent(new Event('input',{bubbles:true}));b.parentNode.removeChild(b)}
+function kyScan(tr,f){var st=function(h,bad){kyMsg(tr,h,bad?'var(--bad)':'')};invReadAny(f,st,function(R){R.per=R.per||kyPer(R.text||'');kyFill(tr,R,f)},'ky'+(tr.dataset.cr)+(tr.rowIndex))}
+/* quét nhiều hóa đơn một lần → tự xếp vào kỳ theo thời gian ghi trên hóa đơn, nếu không có thì theo ngày lập */
+function kyMatch(cr,R){var rs=[].slice.call(document.querySelectorAll('#kyt_'+cr+' tr')),P=R.per,best=null,bs=0;
+ rs.forEach(function(r){var f=r.querySelector('.ky_f').value,t=r.querySelector('.ky_t').value;if(!f)return;var sc=0;
+  if(P){var a=P.from>f?P.from:f,b=P.to<(t||P.to)?P.to:(t||P.to);if(b>=a)sc=2+(pd(b)-pd(a))/864e5/Math.max(1,(pd(t||P.to)-pd(f))/864e5)}
+  else if(R.date&&R.date>=f&&(!t||R.date<=t))sc=1.5;
+  if(sc&&!r.querySelector('.ky_no').value&&!r.querySelector('.ky_d').value)sc+=0.3;if(sc&&R.no&&r.querySelector('.ky_no').value===R.no)sc+=1;if(sc>bs){bs=sc;best=r}});
+ if(!best&&R.date){var c=rs.filter(function(r){var f=r.querySelector('.ky_f').value;return f&&f<=R.date&&!r.querySelector('.ky_d').value});best=c[c.length-1]||null}return best}
+function kyBulk(cr){var i=document.createElement('input');i.type='file';i.multiple=true;i.accept='.pdf,application/pdf,image/*';i.onchange=function(){kyBulkRun(cr,[].slice.call(i.files))};i.click()}
+function kyBulkRun(cr,list){var m=$('#kym_'+cr),q=list.slice(),log=[],k=0;if(!q.length)return;
+ (function nx(){if(!q.length){m.innerHTML='<b>Đã quét '+list.length+' hóa đơn:</b><br>'+log.join('<br>')+'<br>Kiểm tra rồi bấm <b>Lưu trạm</b>.';kySum(cr);yrInit('kyt_'+cr);return Promise.resolve()}var f=q.shift();k++;
+  var w=kyBad(f);if(w){log.push('✗ '+esc(f.name)+': '+w);return nx()}if(!isPdf(f)&&!isImg(f)){log.push('✗ '+esc(f.name)+': chỉ quét được PDF hoặc ảnh');return nx()}
+  var fin=false;invReadAny(f,function(h,bad){if(bad&&!fin){fin=true;log.push('✗ '+esc(f.name)+': không đọc được');nx()}else m.innerHTML='('+k+'/'+list.length+') '+h},function(R){if(fin)return;if(R.aiSt==='run')return;fin=true;R.per=R.per||kyPer(R.text||'');
+   var tr=kyMatch(cr,R);if(!tr){log.push('⚠ '+esc(f.name)+': không xác định được kỳ (số '+esc(R.no||'?')+', ngày '+(R.date?fmt(R.date):'?')+') – đính kèm tay vào kỳ phù hợp');return nx()}
+   tr._kf=(tr._kf||[]).concat([f]);kyFRef(tr);if(!kyFill(tr,R,f,1)){log.push('⚠ '+esc(f.name)+' → Kỳ '+tr.querySelector('.ky_n').textContent+': kỳ đã có hóa đơn khác số, chỉ đính kèm file');return nx()}log.push('✓ '+esc(f.name)+' → <b>Kỳ '+tr.querySelector('.ky_n').textContent+'</b>'+(R.no?' · số '+esc(R.no):'')+(R.total?' · '+money(R.total):''));nx()},'kyb'+k)})()}
+/* hồ sơ trùng (cùng trạm, mục, tên, dung lượng, cùng gắn kỳ / công việc) → giữ bản đầu */
+function fmDedupe(){var seen={},dup=[];FM.slice().sort(function(a,b){return (b.blob?1:0)-(a.blob?1:0)||a.id-b.id}).forEach(function(f){var k=[f.sid,f.cat,f.name,f.size,f.kyk||'',f.eid||'',f.tid||'',f.bid||''].join('|');if(seen[k])dup.push(f);else seen[k]=1});
+ dup.forEach(function(f){delFile(f.id,1)});if(dup.length)audit(0,'Dọn hồ sơ trùng',dup.length+' file trùng: '+dup.map(function(f){return f.name}).join(', '));return dup.length}
+/* hóa đơn treo do ô "hóa đơn kỳ này" cũ tạo ra (Nhật ký ghi "(từ form trạm)", không kỳ / số / mã) */
+function invClrOld(){var rm=[];INV=INV.filter(function(v){if(v.ky||v.no||v.code||v.kyNo!=null||!v.date)return true;var ds='xuất '+fmt(v.date),hit=A.some(function(e){return e.act==='Thêm hóa đơn'&&e.sid===v.sid&&typeof e.det==='string'&&e.det.indexOf('(từ form trạm)')>=0&&e.det.indexOf(crn(v.cr))===0&&e.det.indexOf(ds)>=0});if(hit)rm.push(v);return !hit});
+ rm.forEach(function(v){var x=site(v.sid);audit(v.sid,'Dọn hóa đơn treo',crn(v.cr)+' · xuất '+fmt(v.date)+(v.amt?' · '+money(v.amt):'')+' (tạo từ ô "hóa đơn kỳ này" cũ)')});return rm.length}
 function syncBadge(){var e=$('#sb');if(!e)return;e.style.color='';var set=function(t,full){e.textContent=t;e.title=(full||t)+' – bấm để xem chi tiết';e.dataset.st=t.charAt(0)==='✓'?'ok':t.charAt(0)==='⚠'?'err':t.charAt(0)==='○'?'off':'busy'};if(!syncOn()){set('○ Chưa kết nối','Đồng bộ online: chưa kết nối');return}
  if(SYNC.busy){set('⟳ Đang đồng bộ…');return}if(SYNC.err){set(SYNC.dirty?'⚠ Chưa gửi được':'⚠ Lỗi đồng bộ',SYNC.dirty?'Chưa gửi được thay đổi':'Lỗi đồng bộ: '+SYNC.err);e.style.color='#ffb4a8';if(!document.documentElement.dataset.skin)e.style.color='var(--bad)';return}
  set(SYNC.dirty?'● Chờ gửi…':'✓ Đồng bộ'+(SYNC.last?' '+fdt(SYNC.last).slice(11):''),SYNC.dirty?'Có thay đổi chờ gửi':'Đã đồng bộ'+(SYNC.last?' lúc '+fdt(SYNC.last):''))}
@@ -1697,7 +1760,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){var a=$('#a
 function accToggle(ev){ev.stopPropagation();$('#acc').classList.toggle('open')}
 document.addEventListener('click',function(ev){var a=$('#acc');if(a&&a.classList.contains('open')&&!(ev.target.closest&&ev.target.closest('.accm select,#thm')))a.classList.remove('open')});
 /* ===== Tự kiểm tra phiên bản mới trên GitHub Pages ===== */
-var APPV='2026.11.11-9';
+var APPV='2026.11.11-10';
 function checkUpdate(){if(!/^https?:/.test(location.protocol))return;fetch(location.pathname+'?nocache='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(t){var m=/var APPV='([^']+)'/.exec(t||'');if(!m||m[1]===APPV||$('#updbar'))return;
  var d=document.createElement('div');d.id='updbar';d.innerHTML='Đã có phiên bản mới của ứng dụng. <button class="btn p" onclick="location.replace(location.pathname+\'?v='+m[1]+'\'+location.hash)">Cập nhật ngay</button>';document.body.appendChild(d)}).catch(function(){})}
 setTimeout(checkUpdate,4000);setInterval(function(){if(!document.hidden)checkUpdate()},15*60*1000);document.addEventListener('visibilitychange',function(){if(!document.hidden)checkUpdate()});
@@ -1948,7 +2011,7 @@ function openNotif(){if(!ROLE||ROLE==='guest')return;var st=notifState(),ad=isAd
  if(!syncOn()){$('#nt_list').textContent='—';return}
  sget('action=inbox&user='+encodeURIComponent(ROLE)+'&since=0').then(function(r){var it=(r.items||[]).slice().reverse();$('#nt_list').innerHTML=it.length?it.slice(0,15).map(function(x){return '<div class="nt-it"><b>'+esc(x.title)+'</b><span>'+esc(fdt(x.t))+'</span><div>'+esc(x.body).replace(/\n/g,'<br>')+'</div></div>'}).join(''):'Chưa có thông báo nào.'},function(){$('#nt_list').textContent='Không tải được (máy chủ chưa cập nhật mã mới?).'});
  if(ad)spost({action:'pushStatus'}).then(function(r){if(!r.ok)return;ACCS.forEach(function(a){var e=$('#nt_d_'+a[0]);if(e){var d=(r.subs||{})[a[0]]||[];e.textContent=d.length?'· 📱 '+d[0].dev:'· chưa bật'}})}).catch(function(){})}
-var GASV='2026.11.10h';
+var GASV='2026.11.11a';
 function ntDiag(){var L=[],ok=function(b,t){return '<li>'+(b?'✅ ':'⚠️ ')+t+'</li>'},put=function(){var e=$('#nt_diag');if(e)e.innerHTML=L.join('')};
  L.push(ok(syncOn(),syncOn()?'Đã kết nối Đồng bộ online.':'Chưa kết nối Đồng bộ online – thông báo đẩy cần máy chủ.'));
  L.push(ok(pushSupported(),pushSupported()?'Trình duyệt hỗ trợ thông báo đẩy.':'Trình duyệt / chế độ mở này không hỗ trợ (cần mở bằng link https, Chrome / Safari mới).'));
@@ -2118,9 +2181,9 @@ function invParse(T){T=String(T||'').normalize('NFC').replace(/[ \t ]+/g,' ');v
  // Người mua → nhà mạng
  var bi=Fo.search(/(nguoi mua|don vi mua|ten don vi mua|buyer|khach hang)/),seg=bi>=0?Fo.slice(bi,bi+400):Fo;
  R.carrier=/mobifone/.test(seg)?'mb':/viettel/.test(seg)?'vt':/vinaphone|vnpt/.test(seg)?'vn':'';
- invSmart(R,T,Fo);
+ invSmart(R,T,Fo);R.per=kyPer(T);R.text=T;
  return R}
-function invScanBox(cr){return '<div class="geo invs"><div class="geob"><input type="file" id="isf_'+cr+'" accept=".pdf,application/pdf" hidden onchange="invScanForm(\''+cr+'\',this.files[0])"><button type="button" class="btn p" onclick="$(\'#isf_'+cr+'\').click()">📄 Quét PDF hóa đơn</button></div><div class="m" id="ism_'+cr+'">Tự điền <b>giá trị sau VAT</b>, <b>ngày lập</b>, <b>số</b> và <b>mã hóa đơn</b> từ file PDF hóa đơn điện tử'+(aiOn()?' (đọc trên máy, sau đó AI kiểm tra lại).':' (đọc ngay trên máy).')+'</div></div>'}
+function invScanBox(cr){return '<div class="geo invs"><div class="geob"><input type="file" id="isf_'+cr+'" accept=".pdf,application/pdf,image/*" hidden onchange="invScanForm(\''+cr+'\',this.files[0])"><button type="button" class="btn p" onclick="$(\'#isf_'+cr+'\').click()">📄 Quét PDF hóa đơn</button></div><div class="m" id="ism_'+cr+'">Tự điền <b>giá trị sau VAT</b>, <b>ngày lập</b>, <b>số</b> và <b>mã hóa đơn</b> từ file PDF hóa đơn điện tử'+(aiOn()?' (đọc trên máy, sau đó AI kiểm tra lại).':' (đọc ngay trên máy).')+'</div></div>'}
 function invResultHtml(R,cr){return aiLine(R)+invResultHtml0(R,cr)}
 function invResultHtml0(R,cr){var ck=function(v,lab,k){return '<li>'+lab+': '+(v?'<b>'+esc(v)+'</b>':'<span style="color:var(--warn)">không tìm thấy – nhập tay</span>')+(R.ev[k]?'<span class="sc_ev">“…'+esc(R.ev[k])+'…”</span>':'')+'</li>'};
  return '<ul class="invr">'+ck(R.total?money(R.total):'','Tổng tiền thanh toán (sau VAT)','total')+(R.pre||R.vat?'<li class="m">Tiền hàng '+(R.pre?money(R.pre):'?')+' + thuế GTGT'+(R.rate!=null?' '+R.rate+'%':'')+' '+(R.vat?money(R.vat):'?')+(R.check===true?' <span class="b ok">✓ khớp tổng</span>':R.check===false?' <span class="b bad">không khớp tổng – kiểm tra lại</span>':'')+'</li>':'')
@@ -2130,12 +2193,12 @@ function invRead(f,st,done,key){if(!f)return;if(!isPdf(f)){st('Chỉ nhận file
  scanText(f,function(t){st('<span class="spin"></span> '+esc(t))}).then(function(r){var R=invParse(r.text);R.ocr=r.ocr;key=key||'x';AITOK[key]=f;if(aiOn())R.aiSt='run';done(R);
   if(R.aiSt)aiRead('inv',f).then(function(A){if(AITOK[key]===f)done(aiInv(R,A))},function(e){if(AITOK[key]!==f)return;R.aiSt='err';R.aiErr=e&&e.message||String(e);done(R)})},function(e){st('Không đọc được file: '+esc(e&&e.message||e),1)})}
 function invScanForm(cr,f){var p=cr+'_',mEl=function(){return $('#ism_'+cr)},st=function(h,bad){var e=mEl();if(e){e.innerHTML=h;e.style.color=bad?'var(--bad)':''}};
- invRead(f,st,function(R){var set=function(k,v){var e=$('#f_'+p+k);if(e&&v!=null&&v!==''&&fillVal(e,v,R.ai))e.dispatchEvent(new Event('input'))};
+ invReadAny(f,st,function(R){var set=function(k,v){var e=$('#f_'+p+k);if(e&&v!=null&&v!==''&&fillVal(e,v,R.ai))e.dispatchEvent(new Event('input'))};
   set('payAmt',R.total?String(R.total):'');set('invDate',R.date);set('invNo',R.no);set('invCode',R.code);INVF[cr]=f;
   st('<b>'+esc(f.name)+'</b>'+(R.ocr?' · đọc bằng nhận dạng chữ (bản scan) – soát kỹ':'')+' · đã điền vào các ô phía trên:'+invResultHtml(R,cr)+'<label style="display:flex;gap:8px;align-items:center;color:var(--tx);margin-top:4px"><input type="checkbox" id="isa_'+cr+'" style="width:auto"'+(R.ai&&$('#isa_'+cr)&&!$('#isa_'+cr).checked?'':' checked')+'> Đính kèm file PDF hóa đơn vào hồ sơ '+esc(crn(cr))+' khi lưu trạm</label>')},cr)}
 function invAttachForm(sid){Object.keys(INVF).forEach(function(cr){var f=INVF[cr],cb=$('#isa_'+cr);if(f&&(!cb||cb.checked)){var no=($('#f_'+cr+'_invNo')||{}).value||'';addFiles(sid,cr,[f],'Hóa đơn'+(no?' số '+no:'')+' (quét PDF)')}});INVF={}}
 function invScanDlg(f){var st=function(h,bad){var e=$('#ism_i');if(e){e.innerHTML=h;e.style.color=bad?'var(--bad)':''}};
- invRead(f,st,function(R){var set=function(id,v){var e=$(id);if(e&&v!=null&&v!=='')fillVal(e,v,R.ai)};set('#i_amt',R.total?String(R.total):'');if(R.total)$('#i_amt').dataset.auto='0';set('#i_date',R.date);set('#i_no',R.no);set('#i_code',R.code);if(R.carrier){$('#i_cr').value=R.carrier}INVF.dlg=f;
+ invReadAny(f,st,function(R){var set=function(id,v){var e=$(id);if(e&&v!=null&&v!=='')fillVal(e,v,R.ai)};set('#i_amt',R.total?String(R.total):'');if(R.total)$('#i_amt').dataset.auto='0';set('#i_date',R.date);set('#i_no',R.no);set('#i_code',R.code);if(R.carrier){$('#i_cr').value=R.carrier}INVF.dlg=f;
   st('<b>'+esc(f.name)+'</b>'+(R.ocr?' · bản scan – soát kỹ':'')+' · đã điền:'+invResultHtml(R,$('#i_cr').value)+'<label style="display:flex;gap:8px;align-items:center;color:var(--tx);margin-top:4px"><input type="checkbox" id="isa_dlg" style="width:auto"'+(R.ai&&$('#isa_dlg')&&!$('#isa_dlg').checked?'':' checked')+'> Đính kèm file PDF hóa đơn vào hồ sơ trạm khi lưu</label>')},'dlg')}
 
 /* ===== Dấu đỏ "việc mới" cho người được giao (chạy ngay trong ứng dụng, không cần thông báo đẩy) ===== */
@@ -2190,7 +2253,7 @@ function aiOn(){return syncOn()&&!!(SYNC.srv&&SYNC.srv.ai)&&aiDev()&&navigator.o
 function fhash(f){try{if(!(window.crypto&&crypto.subtle&&f.arrayBuffer))return Promise.resolve('')}catch(e){return Promise.resolve('')}return f.arrayBuffer().then(function(b){return crypto.subtle.digest('SHA-256',b)}).then(function(h){return [].map.call(new Uint8Array(h),function(x){return ('0'+x.toString(16)).slice(-2)}).join('')},function(){return ''})}
 function aiRead(kind,f){if(f.size>20*1048576)return Promise.reject(new Error('file quá 20 MB'));var key='';
  return fhash(f).then(function(h){key=h?kind+':'+h:'';var c=key&&(ld('bts_aic')||{})[key];if(c&&c.r)return {ok:true,r:c.r,cached:1};   // cùng nội dung file đã đọc → dùng lại, không gọi AI lần nữa
-  return b64(f).then(function(d){return spost({action:'aiScan',kind:kind,b64:d})})}).then(function(r){if(!r||!r.ok||!r.r)throw new Error(r&&r.error||'máy chủ chưa hỗ trợ AI – cập nhật mã Apps Script');
+  return b64(f).then(function(d){return spost({action:'aiScan',kind:kind,b64:d,mime:isImg(f)?(f.type||'image/jpeg'):'application/pdf'})})}).then(function(r){if(!r||!r.ok||!r.r)throw new Error(r&&r.error||'máy chủ chưa hỗ trợ AI – cập nhật mã Apps Script');
   if(key&&!r.cached){var c=ld('bts_aic')||{};c[key]={t:Date.now(),r:r.r};var ks=Object.keys(c).sort(function(a,b){return c[b].t-c[a].t});ks.slice(150).forEach(function(k){delete c[k]});syncLS('bts_aic',c)}return r.r})}
 function aiD(v){v=String(v||'').trim();return /^\d{4}-\d{2}-\d{2}$/.test(v)&&!isNaN(pd(v))?v:''}
 var AILAB={hd:'số HĐ',bld:'tên tòa nhà',sign:'ngày ký',start:'ngày bắt đầu',end:'ngày hết hạn',months:'thời hạn',price:'giá trị',partyA:'bên A',partyB:'bên B',isPL:'loại văn bản',total:'tổng tiền',no:'số hóa đơn',code:'mã hóa đơn',date:'ngày lập',carrier:'người mua'};
@@ -2211,7 +2274,7 @@ function aiInv(R,A){var q=A.trich_dan||{};return aiMerge(R,function(put,o){
  put('no',String(A.so_hoa_don||'').trim(),'no',q.so);if(A.ky_hieu)o.series=String(A.ky_hieu).toUpperCase();
  if(A.ma_cqt||A.ma_tra_cuu){o.cqt=String(A.ma_cqt||'').trim();o.lookup=String(A.ma_tra_cuu||'').trim();put('code',o.cqt||o.lookup,'code',q.ma)}
  put('date',aiD(A.ngay_lap),'date',q.ngay);if(/^(mb|vt|vn)$/.test(A.nha_mang_mua))put('carrier',A.nha_mang_mua);
- o.aiWarn=A.canh_bao||''})}
+ if(aiD(A.ky_tu)&&aiD(A.ky_den))o.per={from:aiD(A.ky_tu),to:aiD(A.ky_den)};o.aiWarn=A.canh_bao||''})}
 function aiLine(R){if(!R||!R.aiSt)return '';
  if(R.aiSt==='run')return '<div class="aist"><span class="spin"></span> 🤖 AI đang đọc lại file để kiểm tra và điền chính xác hơn… (khoảng 10–40 giây, có thể tiếp tục nhập)</div>';
  if(R.aiSt==='err')return '<div class="aist bad">🤖 AI chưa đọc được: '+esc(R.aiErr||'lỗi')+' – đang dùng kết quả đọc trên máy, hãy soát kỹ.</div>';
@@ -2776,7 +2839,7 @@ pollSched(30000);window.addEventListener('focus',pollWake);window.addEventListen
 
 S=ld(K);L=ld(KL);INV=ld(KI)||[];EL=ld(KE)||[];EQ=ld(KQ)||[];JB=ld(KJ)||[];BM=ld(KB)||[];if(!S){S=sample();L=sampleLog();INV=sampleInv();EL=sampleEl();EQ=sampleEq();JB=sampleJobs();BM=sampleBM();S[0].meterTotal='CT-TONG-0001';S[0].mb_meter='CT-MB-0001';S[0].vt_meter='CT-VT-0001';S[0].vn_meter='CT-VN-0001';S[1].meterTotal='CT-TONG-0010';S[1].vt_meter='CT-VT-0010'}if(!L)L=[];
 (function(){var b=JSON.stringify(S)+JSON.stringify(INV);S.forEach(mig);fillInvAmt();try{if(!localStorage.getItem('bts_mig_cran')){S.forEach(function(x){if((x.kind||'IBS')==='BTS'&&/^\s*c-?ran\b/i.test(x.name||''))x.kind='CRAN'});localStorage.setItem('bts_mig_cran','1')}}catch(e){}if(JSON.stringify(S)+JSON.stringify(INV)!==b)save()})();
-A=ld(KA)||[];
+A=ld(KA)||[];if(invClrOld())save();
 loadACL();try{GS=Number(sessionStorage.getItem('bts_gs'))||0;var ss=sessLoad();if(ss&&(ss==='admin'||(ACL[ss]&&ACL[ss].on))&&sessValid(ss))ROLE=ss;else if(ss){sessClear();setTimeout(function(){var e=$('#lg_e');if(e)e.textContent='Tài khoản đã bị khóa hoặc đổi mật khẩu – vui lòng đăng nhập lại.'},100)}}catch(e){}
 try{if(localStorage.getItem('bts_savefail')&&$('#sw'))$('#sw').hidden=false}catch(e){}
 navIcons();(function(){var v=null;try{v=localStorage.getItem('bts_skin_v2')}catch(e){}setSkin(v)})();setDev(devMode());instBtns();setTimeout(function(){if(ROLE)pushAfterLogin();navHash()},800);applyRole();loadFiles().then(function(){if(syncOn()){if(SYNC.base&&!SYNC.joinedByLink)reconcileFiles(SYNC.base.files||[]);syncNow()}});syncBadge();
@@ -2802,7 +2865,7 @@ const KEEP_DAILY = 30;                      // Số bản sao lưu hằng ngày 
 const SEND_EMAIL_DAILY = true;
 const DAILY_HOUR = 18;                      // Giờ tự động sao lưu + gửi email mỗi ngày (giờ Việt Nam). Google chạy trong khoảng 18:00 – 18:15
 const DATA_FILE = 'du-lieu-ibs.json';
-const CODE_VER = '2026.11.10h';
+const CODE_VER = '2026.11.11a';
 const MIN_APPV = '2026.11.10-22';            // bản ứng dụng cũ hơn bản này không được ghi dữ liệu chung (bản cũ có lỗi gộp làm mất ô hợp đồng)                // phiên bản mã máy chủ – ứng dụng dùng để báo khi máy chủ chưa cập nhật
 
 function doGet(e) {
@@ -3297,7 +3360,7 @@ const AI_SCHEMA = {
   }),
   inv: aiObj_({
     tong_thanh_toan_vnd: AI_I, tien_truoc_thue_vnd: AI_I, tien_thue_vnd: AI_I, thue_suat: AI_I,
-    so_hoa_don: AI_S, ky_hieu: AI_S, ma_cqt: AI_S, ma_tra_cuu: AI_S, ngay_lap: AI_S,
+    so_hoa_don: AI_S, ky_hieu: AI_S, ma_cqt: AI_S, ma_tra_cuu: AI_S, ngay_lap: AI_S, ky_tu: AI_S, ky_den: AI_S,
     ben_ban: AI_S, ben_mua: AI_S, nha_mang_mua: { type: 'string', enum: ['mb', 'vt', 'vn', 'khac'] },
     trich_dan: aiObj_({ tong: AI_S, so: AI_S, ma: AI_S, ngay: AI_S }),
     canh_bao: AI_S
@@ -3315,12 +3378,12 @@ const AI_PROMPT = {
     '- trich_dan: chép nguyên văn đoạn ngắn (dưới 100 ký tự) trong file làm căn cứ cho từng giá trị.\n' +
     '- canh_bao: điều cần người dùng kiểm tra lại (chữ mờ, mâu thuẫn...), "" nếu không có.\n' +
     'Không bịa: thông tin không có trong file thì để "" hoặc 0.',
-  inv: 'Đây là file PDF hóa đơn điện tử (hóa đơn GTGT) của Việt Nam.\n' +
+  inv: 'Đây là file PDF hoặc ảnh chụp hóa đơn điện tử (hóa đơn GTGT) của Việt Nam.\n' +
     'Đọc kỹ và điền các trường:\n' +
     '- tong_thanh_toan_vnd: TỔNG TIỀN THANH TOÁN đã gồm thuế GTGT, số nguyên VNĐ. tien_truoc_thue_vnd: cộng tiền hàng trước thuế. tien_thue_vnd: tiền thuế GTGT. thue_suat: % thuế (−1 nếu không ghi).\n' +
     '- so_hoa_don: số hóa đơn (chỉ phần số, giữ số 0 đứng đầu nếu có). ky_hieu: ký hiệu hóa đơn (ví dụ 1C24TAA).\n' +
     '- ma_cqt: mã của cơ quan thuế (chuỗi dài in trên hóa đơn có mã). ma_tra_cuu: mã tra cứu / mã bí mật nếu có.\n' +
-    '- ngay_lap: ngày lập hóa đơn dạng YYYY-MM-DD.\n' +
+    '- ngay_lap: ngày lập hóa đơn dạng YYYY-MM-DD. ky_tu, ky_den: thời gian (kỳ) dịch vụ ghi trên hóa đơn dạng YYYY-MM-DD, ví dụ "Quý 3/2026" là 2026-07-01 và 2026-09-30 ("" nếu không ghi).\n' +
     '- ben_ban, ben_mua: tên đơn vị bán, đơn vị mua. nha_mang_mua: "mb"/"vt"/"vn" nếu đơn vị MUA là MobiFone / Viettel / VNPT-Vinaphone, ngược lại "khac".\n' +
     '- trich_dan: chép nguyên văn đoạn ngắn (dưới 100 ký tự) làm căn cứ. canh_bao: điều cần kiểm tra lại, "" nếu không có.\n' +
     'Không bịa: thông tin không có trong file thì để "" hoặc 0.'
@@ -3347,7 +3410,7 @@ function aiScan_(req) {
     fallbacks: 'default',
     system: 'Bạn là trợ lý nhập liệu, đọc chính xác hợp đồng và hóa đơn tiếng Việt. Chỉ trả về đúng các trường được yêu cầu.',
     messages: [{ role: 'user', content: [
-      { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b } },
+      /^image\/(jpeg|png|webp|gif)$/.test(String(req.mime || '')) ? { type: 'image', source: { type: 'base64', media_type: String(req.mime), data: b } } : { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b } },
       { type: 'text', text: AI_PROMPT[kind] }
     ] }]
   };
@@ -3376,5 +3439,4 @@ function aiScan_(req) {
   try { res = JSON.parse(txt); } catch (e) { return out({ ok: false, error: 'AI trả về dữ liệu không đọc được' }); }
   return out({ ok: true, kind: kind, r: res, model: j.model || AI_MODEL, usage: j.usage || null });
 }
-
 </script></body></html>
